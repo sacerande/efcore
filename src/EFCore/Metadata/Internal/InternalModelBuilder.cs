@@ -48,7 +48,17 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
         /// </summary>
         public virtual InternalEntityTypeBuilder Entity(
             [NotNull] string name, ConfigurationSource configurationSource, bool? shouldBeOwned = false)
-            => Entity(new TypeIdentity(name), configurationSource, shouldBeOwned);
+            => Entity(new TypeIdentity(name), null, configurationSource, shouldBeOwned);
+
+        /// <summary>
+        ///     This is an internal API that supports the Entity Framework Core infrastructure and not subject to
+        ///     the same compatibility standards as public APIs. It may be changed or removed without notice in
+        ///     any release. You should only use it directly in your code with extreme caution and knowing that
+        ///     doing so can result in application failures when updating to a new Entity Framework Core release.
+        /// </summary>
+        public virtual InternalEntityTypeBuilder Entity(
+            [NotNull] string name, [NotNull] Type type, ConfigurationSource configurationSource, bool? shouldBeOwned = false)
+            => Entity(new TypeIdentity(name), Check.NotNull(type, nameof(type)), configurationSource, shouldBeOwned);
 
         /// <summary>
         ///     This is an internal API that supports the Entity Framework Core infrastructure and not subject to
@@ -58,10 +68,10 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
         /// </summary>
         public virtual InternalEntityTypeBuilder Entity(
             [NotNull] Type type, ConfigurationSource configurationSource, bool? shouldBeOwned = false)
-            => Entity(new TypeIdentity(type, Metadata), configurationSource, shouldBeOwned);
+            => Entity(new TypeIdentity(type, Metadata), null, configurationSource, shouldBeOwned);
 
         private InternalEntityTypeBuilder Entity(
-            in TypeIdentity type, ConfigurationSource configurationSource, bool? shouldBeOwned)
+            in TypeIdentity type, Type sharedTypeClrType, ConfigurationSource configurationSource, bool? shouldBeOwned)
         {
             if (IsIgnored(type, configurationSource))
             {
@@ -74,9 +84,10 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
                 : Metadata.FindEntityType(clrType);
 
             if (shouldBeOwned == false
-                && (ShouldBeOwnedType(type)
-                    || entityType != null && entityType.IsOwned()))
+                && (ShouldBeOwnedType(type) // Marked in model as owned
+                    || entityType != null && entityType.IsOwned())) // Created using Owns* API
             {
+                // We always throw as configuring a type as owned is always comes from user (through Explicit/DataAnnotation)
                 throw new InvalidOperationException(
                     CoreStrings.ClashingOwnedEntityType(
                         clrType == null ? type.Name : clrType.ShortDisplayName()));
@@ -106,14 +117,31 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
 
             if (entityType != null)
             {
+                if (sharedTypeClrType != null)
+                {
+                    if (!entityType.HasSharedClrType
+                        && configurationSource == ConfigurationSource.Explicit
+                        && entityType.GetConfigurationSource() == ConfigurationSource.Explicit)
+                    {
+                        throw new InvalidOperationException("Clashing non shared clr type.");
+                    }
+
+                    if (entityType.ClrType != sharedTypeClrType)
+                    {
+                        throw new InvalidOperationException("Same name used for different shared type entity type.");
+                    }
+                }
+
                 entityType.UpdateConfigurationSource(configurationSource);
                 return entityType.Builder;
             }
 
             Metadata.RemoveIgnored(type.Name);
-            entityType = clrType == null
-                ? Metadata.AddEntityType(type.Name, configurationSource)
-                : Metadata.AddEntityType(clrType, configurationSource);
+            entityType = clrType != null
+                ? Metadata.AddEntityType(clrType, configurationSource)
+                : sharedTypeClrType != null
+                    ? Metadata.AddEntityType(type.Name, sharedTypeClrType, configurationSource)
+                    : Metadata.AddEntityType(type.Name, configurationSource);
 
             return entityType?.Builder;
         }
@@ -560,7 +588,8 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
         /// </summary>
         IConventionModel IConventionModelBuilder.Metadata
         {
-            [DebuggerStepThrough] get => Metadata;
+            [DebuggerStepThrough]
+            get => Metadata;
         }
 
         /// <summary>
@@ -572,6 +601,16 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
         [DebuggerStepThrough]
         IConventionEntityTypeBuilder IConventionModelBuilder.Entity(string name, bool? shouldBeOwned, bool fromDataAnnotation)
             => Entity(name, fromDataAnnotation ? ConfigurationSource.DataAnnotation : ConfigurationSource.Convention, shouldBeOwned);
+
+        /// <summary>
+        ///     This is an internal API that supports the Entity Framework Core infrastructure and not subject to
+        ///     the same compatibility standards as public APIs. It may be changed or removed without notice in
+        ///     any release. You should only use it directly in your code with extreme caution and knowing that
+        ///     doing so can result in application failures when updating to a new Entity Framework Core release.
+        /// </summary>
+        [DebuggerStepThrough]
+        IConventionEntityTypeBuilder IConventionModelBuilder.Entity(string name, Type type, bool? shouldBeOwned, bool fromDataAnnotation)
+            => Entity(name, type, fromDataAnnotation ? ConfigurationSource.DataAnnotation : ConfigurationSource.Convention, shouldBeOwned);
 
         /// <summary>
         ///     This is an internal API that supports the Entity Framework Core infrastructure and not subject to

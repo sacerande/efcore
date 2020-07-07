@@ -477,6 +477,34 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
             Assert.Same(manyToManyJoin.Metadata, leftSkipNav.AssociationEntityType);
         }
 
+        [ConditionalFact]
+        public void Can_add_shared_type()
+        {
+            var model = new Model();
+            var modelBuilder = CreateModelBuilder(model);
+
+            var entityBuilder = modelBuilder.Entity(typeof(Customer), ConfigurationSource.Explicit);
+            var sharedTypeName = "SpecialDetails";
+
+            Assert.NotNull(modelBuilder.Entity(sharedTypeName, typeof(Details), ConfigurationSource.Convention));
+
+            Assert.True(model.FindEntityType(sharedTypeName).HasSharedClrType);
+
+            Assert.Equal(
+                "Same name used for different shared type entity type.",
+                Assert.Throws<InvalidOperationException>(() => modelBuilder.Entity(sharedTypeName, typeof(Product), ConfigurationSource.DataAnnotation)).Message);
+
+            Assert.NotNull(modelBuilder.Entity(typeof(Product), ConfigurationSource.DataAnnotation));
+
+            Assert.NotNull(modelBuilder.Entity(typeof(Product).DisplayName(), typeof(Product), ConfigurationSource.DataAnnotation));
+
+            Assert.NotNull(modelBuilder.Entity(typeof(Product), ConfigurationSource.Explicit));
+
+            Assert.Equal(
+                "Clashing non shared clr type.",
+                Assert.Throws<InvalidOperationException>(() => modelBuilder.Entity(typeof(Product).DisplayName(), typeof(Product), ConfigurationSource.Explicit)).Message);
+        }
+
         private static void Cleanup(InternalModelBuilder modelBuilder)
         {
             new ModelCleanupConvention(CreateDependencies())

@@ -75,9 +75,21 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
             public override TestEntityTypeBuilder<TEntity> Entity<TEntity>()
                 => new NonGenericTestEntityTypeBuilder<TEntity>(ModelBuilder.Entity(typeof(TEntity)));
 
+            public override TestEntityTypeBuilder<TEntity> Entity<TEntity>(string name)
+                => new NonGenericTestEntityTypeBuilder<TEntity>(ModelBuilder.Entity(name, typeof(TEntity)));
+
             public override TestModelBuilder Entity<TEntity>(Action<TestEntityTypeBuilder<TEntity>> buildAction)
             {
                 ModelBuilder.Entity(
+                    typeof(TEntity), entityTypeBuilder =>
+                        buildAction(new NonGenericTestEntityTypeBuilder<TEntity>(entityTypeBuilder)));
+                return this;
+            }
+
+            public override TestModelBuilder Entity<TEntity>(string name, Action<TestEntityTypeBuilder<TEntity>> buildAction)
+            {
+                ModelBuilder.Entity(
+                    name,
                     typeof(TEntity), entityTypeBuilder =>
                         buildAction(new NonGenericTestEntityTypeBuilder<TEntity>(entityTypeBuilder)));
                 return this;

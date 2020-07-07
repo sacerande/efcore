@@ -119,6 +119,21 @@ namespace Microsoft.EntityFrameworkCore
         ///     Returns an object that can be used to configure a given entity type in the model.
         ///     If the entity type is not already part of the model, it will be added to the model.
         /// </summary>
+        /// <typeparam name="TEntity"> The CLR type of the entity type to be configured. </typeparam>
+        /// <param name="name"> The name of the entity type to be configured. </param>
+        /// <returns> An object that can be used to configure the entity type. </returns>
+        public virtual EntityTypeBuilder<TEntity> Entity<TEntity>([NotNull] string name)
+            where TEntity : class
+        {
+            Check.NotEmpty(name, nameof(name));
+
+            return new EntityTypeBuilder<TEntity>(Builder.Entity(name, typeof(TEntity), ConfigurationSource.Explicit).Metadata);
+        }
+
+        /// <summary>
+        ///     Returns an object that can be used to configure a given entity type in the model.
+        ///     If the entity type is not already part of the model, it will be added to the model.
+        /// </summary>
         /// <param name="type"> The entity type to be configured. </param>
         /// <returns> An object that can be used to configure the entity type. </returns>
         public virtual EntityTypeBuilder Entity([NotNull] Type type)
@@ -143,6 +158,22 @@ namespace Microsoft.EntityFrameworkCore
         }
 
         /// <summary>
+        ///     Returns an object that can be used to configure a given entity type in the model.
+        ///     If an entity type with the provided name is not already part of the model,
+        ///     a new entity type that does not have a corresponding CLR type will be added to the model.
+        /// </summary>
+        /// <param name="name"> The name of the entity type to be configured. </param>
+        /// <param name="clrType"> The CLR type of the entity type to be configured. </param>
+        /// <returns> An object that can be used to configure the entity type. </returns>
+        public virtual EntityTypeBuilder Entity([NotNull] string name, [NotNull] Type clrType)
+        {
+            Check.NotEmpty(name, nameof(name));
+            Check.NotNull(clrType, nameof(clrType));
+
+            return new EntityTypeBuilder(Builder.Entity(name, clrType, ConfigurationSource.Explicit).Metadata);
+        }
+
+        /// <summary>
         ///     <para>
         ///         Performs configuration of a given entity type in the model. If the entity type is not already part
         ///         of the model, it will be added to the model.
@@ -164,6 +195,34 @@ namespace Microsoft.EntityFrameworkCore
             Check.NotNull(buildAction, nameof(buildAction));
 
             buildAction(Entity<TEntity>());
+
+            return this;
+        }
+
+        /// <summary>
+        ///     <para>
+        ///         Performs configuration of a given entity type in the model. If the entity type is not already part
+        ///         of the model, it will be added to the model.
+        ///     </para>
+        ///     <para>
+        ///         This overload allows configuration of the entity type to be done in line in the method call rather
+        ///         than being chained after a call to <see cref="Entity{TEntity}()" />. This allows additional
+        ///         configuration at the model level to be chained after configuration for the entity type.
+        ///     </para>
+        /// </summary>
+        /// <typeparam name="TEntity"> The CLR type of the entity type to be configured. </typeparam>
+        /// <param name="name"> The name of the entity type to be configured. </param>
+        /// <param name="buildAction"> An action that performs configuration of the entity type. </param>
+        /// <returns>
+        ///     The same <see cref="ModelBuilder" /> instance so that additional configuration calls can be chained.
+        /// </returns>
+        public virtual ModelBuilder Entity<TEntity>([NotNull] string name, [NotNull] Action<EntityTypeBuilder<TEntity>> buildAction)
+            where TEntity : class
+        {
+            Check.NotEmpty(name, nameof(name));
+            Check.NotNull(buildAction, nameof(buildAction));
+
+            buildAction(Entity<TEntity>(name));
 
             return this;
         }
@@ -222,10 +281,39 @@ namespace Microsoft.EntityFrameworkCore
         }
 
         /// <summary>
+        ///     <para>
+        ///         Performs configuration of a given entity type in the model.
+        ///         If an entity type with the provided name is not already part of the model,
+        ///         a new entity type that does not have a corresponding CLR type will be added to the model.
+        ///     </para>
+        ///     <para>
+        ///         This overload allows configuration of the entity type to be done in line in the method call rather
+        ///         than being chained after a call to <see cref="Entity(string)" />. This allows additional
+        ///         configuration at the model level to be chained after configuration for the entity type.
+        ///     </para>
+        /// </summary>
+        /// <param name="name"> The name of the entity type to be configured. </param>
+        /// <param name="clrType"> The CLR type of the entity type to be configured. </param>
+        /// <param name="buildAction"> An action that performs configuration of the entity type. </param>
+        /// <returns>
+        ///     The same <see cref="ModelBuilder" /> instance so that additional configuration calls can be chained.
+        /// </returns>
+        public virtual ModelBuilder Entity([NotNull] string name, [NotNull] Type clrType, [NotNull] Action<EntityTypeBuilder> buildAction)
+        {
+            Check.NotEmpty(name, nameof(name));
+            Check.NotNull(clrType, nameof(clrType));
+            Check.NotNull(buildAction, nameof(buildAction));
+
+            buildAction(Entity(name, clrType));
+
+            return this;
+        }
+
+        /// <summary>
         ///     Excludes the given entity type from the model. This method is typically used to remove types from
         ///     the model that were added by convention.
         /// </summary>
-        /// <typeparam name="TEntity"> The  entity type to be removed from the model. </typeparam>
+        /// <typeparam name="TEntity"> The entity type to be removed from the model. </typeparam>
         /// <returns>
         ///     The same <see cref="ModelBuilder" /> instance so that additional configuration calls can be chained.
         /// </returns>
@@ -246,6 +334,23 @@ namespace Microsoft.EntityFrameworkCore
             Check.NotNull(type, nameof(type));
 
             Builder.Ignore(type, ConfigurationSource.Explicit);
+
+            return this;
+        }
+
+        /// <summary>
+        ///     Excludes the given entity type from the model. This method is typically used to remove types from
+        ///     the model that were added by convention.
+        /// </summary>
+        /// <param name="name"> The name of the entity type to be removed from the model. </param>
+        /// <returns>
+        ///     The same <see cref="ModelBuilder" /> instance so that additional configuration calls can be chained.
+        /// </returns>
+        public virtual ModelBuilder Ignore([NotNull] string name)
+        {
+            Check.NotEmpty(name, nameof(name));
+
+            Builder.Ignore(name, ConfigurationSource.Explicit);
 
             return this;
         }

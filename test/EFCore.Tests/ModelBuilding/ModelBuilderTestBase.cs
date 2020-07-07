@@ -150,10 +150,16 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
             public abstract TestEntityTypeBuilder<TEntity> Entity<TEntity>()
                 where TEntity : class;
 
+            public abstract TestEntityTypeBuilder<TEntity> Entity<TEntity>(string name)
+                where TEntity : class;
+
             public abstract TestOwnedEntityTypeBuilder<TEntity> Owned<TEntity>()
                 where TEntity : class;
 
             public abstract TestModelBuilder Entity<TEntity>(Action<TestEntityTypeBuilder<TEntity>> buildAction)
+                where TEntity : class;
+
+            public abstract TestModelBuilder Entity<TEntity>(string name, Action<TestEntityTypeBuilder<TEntity>> buildAction)
                 where TEntity : class;
 
             public abstract TestModelBuilder Ignore<TEntity>()

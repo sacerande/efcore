@@ -714,6 +714,15 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
 
             _ignoredTypeNames[name] = configurationSource;
 
+            if (type == null)
+            {
+                // This is to popualte Type for convention when removing shared type entity type
+                type = _entityTypes.TryGetValue(name, out var existingEntityType)
+                    && existingEntityType.HasSharedClrType
+                    ? existingEntityType.ClrType
+                    : null;
+            }
+
             return ConventionDispatcher.OnEntityTypeIgnored(Builder, name, type);
         }
 

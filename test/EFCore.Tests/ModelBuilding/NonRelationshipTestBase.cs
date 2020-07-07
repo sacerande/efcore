@@ -1540,6 +1540,28 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                 Assert.Equal(2, data["Required"]);
                 Assert.False(data.ContainsKey("Optional"));
             }
+
+            [ConditionalFact]
+            public virtual void Can_add_shared_type_entity_type()
+            {
+                var modelBuilder = CreateModelBuilder();
+                modelBuilder.Entity<Dictionary<string, object>>("Shared1");
+
+                modelBuilder.Entity<Dictionary<string, object>>("Shared2", b => b.IndexerProperty<int>("Id"));
+
+                var model = modelBuilder.Model;
+                Assert.Equal(2, model.GetEntityTypes().Count());
+
+                var shared1 = modelBuilder.Model.FindEntityType("Shared1");
+                Assert.NotNull(shared1);
+                Assert.True(shared1.HasSharedClrType);
+                Assert.Empty(shared1.GetProperties());
+
+                var shared2 = modelBuilder.Model.FindEntityType("Shared2");
+                Assert.NotNull(shared2);
+                Assert.True(shared2.HasSharedClrType);
+                Assert.Equal("Id", Assert.Single(shared2.GetProperties()).Name);
+            }
         }
     }
 }

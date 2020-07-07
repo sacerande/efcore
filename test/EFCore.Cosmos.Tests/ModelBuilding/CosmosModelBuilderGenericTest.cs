@@ -171,6 +171,27 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                 Assert.Empty(entity.GetKeys().Where(k => k != entity.FindPrimaryKey()));
             }
 
+            public override void Can_add_shared_type_entity_type()
+            {
+                var modelBuilder = CreateModelBuilder();
+                modelBuilder.Entity<Dictionary<string, object>>("Shared1");
+
+                modelBuilder.Entity<Dictionary<string, object>>("Shared2", b => b.IndexerProperty<int>("Id"));
+
+                var model = modelBuilder.Model;
+                Assert.Equal(2, model.GetEntityTypes().Count());
+
+                var shared1 = modelBuilder.Model.FindEntityType("Shared1");
+                Assert.NotNull(shared1);
+                Assert.True(shared1.HasSharedClrType);
+                Assert.Equal(new [] { "Discriminator", "__id", "__jObject" }, shared1.GetProperties().Select(e => e.Name));
+
+                var shared2 = modelBuilder.Model.FindEntityType("Shared2");
+                Assert.NotNull(shared2);
+                Assert.True(shared2.HasSharedClrType);
+                Assert.Equal(new[] { "Id", "Discriminator", "__id", "__jObject" }, shared2.GetProperties().Select(e => e.Name));
+            }
+
             protected override TestModelBuilder CreateModelBuilder()
                 => CreateTestModelBuilder(CosmosTestHelpers.Instance);
         }

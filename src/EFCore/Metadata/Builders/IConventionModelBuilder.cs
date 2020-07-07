@@ -41,6 +41,24 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
 
         /// <summary>
         ///     Returns an object that can be used to configure a given entity type in the model.
+        ///     If an entity type with the provided name is not already part of the model,
+        ///     a new shadow entity type will be added to the model.
+        /// </summary>
+        /// <param name="name"> The name of the entity type to be configured. </param>
+        /// <param name="type"> The type of the entity type to be configured. </param>
+        /// <param name="shouldBeOwned">
+        ///     <see langword="true" /> if the entity type should be owned,
+        ///     <see langword="false" /> if the entity type should not be owned
+        /// </param>
+        /// <param name="fromDataAnnotation"> Indicates whether the configuration was specified using a data annotation. </param>
+        /// <returns>
+        ///     An object that can be used to configure the entity type if the entity type was added or already part of the model,
+        ///     <see langword="null" /> otherwise.
+        /// </returns>
+        IConventionEntityTypeBuilder Entity([NotNull] string name, [NotNull] Type type, bool? shouldBeOwned = false, bool fromDataAnnotation = false);
+
+        /// <summary>
+        ///     Returns an object that can be used to configure a given entity type in the model.
         ///     If an entity type with the provided type is not already part of the model,
         ///     a new entity type will be added to the model.
         /// </summary>
