@@ -496,12 +496,12 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
 
             Assert.NotNull(modelBuilder.Entity(typeof(Product), ConfigurationSource.DataAnnotation));
 
-            Assert.NotNull(modelBuilder.Entity(typeof(Product).DisplayName(), typeof(Product), ConfigurationSource.DataAnnotation));
+            Assert.Null(modelBuilder.Entity(typeof(Product).DisplayName(), typeof(Product), ConfigurationSource.DataAnnotation));
 
             Assert.NotNull(modelBuilder.Entity(typeof(Product), ConfigurationSource.Explicit));
 
             Assert.Equal(
-                "Clashing non shared clr type.",
+                "Existing nonshared type",
                 Assert.Throws<InvalidOperationException>(() => modelBuilder.Entity(typeof(Product).DisplayName(), typeof(Product), ConfigurationSource.Explicit)).Message);
         }
 

@@ -66,6 +66,11 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
             public override void Can_use_shared_type_entity_type_with_has_one_inside_owned_entity()
             {
             }
+
+            //Shadow navigations not supported #3864
+            public override void Cannot_add_shared_type_when_non_shared_exists_nested()
+            {
+            }
         }
 
         public class NonGenericStringOneToManyType : OneToManyTestBase

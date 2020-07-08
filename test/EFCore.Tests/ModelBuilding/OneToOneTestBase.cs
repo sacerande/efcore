@@ -4071,6 +4071,24 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                     .WithOne();
 
                 Assert.Equal(2, modelBuilder.Model.GetEntityTypes().Where(e => e.HasSharedClrType).Count());
+
+                Assert.Equal(
+                    "CannotCreateEntityType",
+                    Assert.Throws<InvalidOperationException>(() => modelBuilder.Entity<SharedTypeEntityType>()).Message);
+            }
+
+            [ConditionalFact]
+            public virtual void Cannot_add_shared_type_when_non_shared_exists()
+            {
+                var modelBuilder = CreateModelBuilder();
+
+                modelBuilder.Entity<SharedTypeEntityType>();
+
+                Assert.Equal(
+                    "Existing nonshared type",
+                    Assert.Throws<InvalidOperationException>(
+                        () => modelBuilder.Entity<SharedHolderAlpha>()
+                            .HasOne<SharedTypeEntityType>("Shared1", e => e.SharedReference)).Message);
             }
         }
     }

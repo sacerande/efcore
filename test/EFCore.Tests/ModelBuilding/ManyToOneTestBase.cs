@@ -2018,6 +2018,20 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
 
                 Assert.Equal(2, modelBuilder.Model.GetEntityTypes().Where(e => e.HasSharedClrType).Count());
             }
+
+            [ConditionalFact]
+            public virtual void Cannot_add_shared_type_when_non_shared_exists()
+            {
+                var modelBuilder = CreateModelBuilder();
+
+                modelBuilder.Entity<SharedTypeEntityType>();
+
+                Assert.Equal(
+                    "Existing nonshared type",
+                    Assert.Throws<InvalidOperationException>(
+                        () => modelBuilder.Entity<SharedHolderAlpha>()
+                            .HasMany("Shared1", e => e.SharedCollection)).Message);
+            }
         }
     }
 }

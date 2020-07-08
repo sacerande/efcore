@@ -79,9 +79,29 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
             }
 
             var clrType = type.Type;
-            var entityType = clrType == null
-                ? Metadata.FindEntityType(type.Name)
-                : Metadata.FindEntityType(clrType);
+            EntityType entityType;
+            if (clrType != null)
+            {
+                if (Metadata.IsShared(clrType))
+                {
+                    return configurationSource == ConfigurationSource.Explicit
+                        ? throw new InvalidOperationException("CannotCreateEntityType")
+                        : (InternalEntityTypeBuilder)null;
+                }
+
+                entityType = Metadata.FindEntityType(clrType);
+            }
+            else
+            {
+                if (sharedTypeClrType != null && Metadata.FindEntityType(Metadata.GetDisplayName(sharedTypeClrType)) != null)
+                {
+                    return configurationSource == ConfigurationSource.Explicit
+                        ? throw new InvalidOperationException("Existing nonshared type")
+                        : (InternalEntityTypeBuilder)null;
+                }
+
+                entityType = Metadata.FindEntityType(type.Name);
+            }
 
             if (shouldBeOwned == false
                 && (ShouldBeOwnedType(type) // Marked in model as owned
@@ -119,13 +139,6 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
             {
                 if (sharedTypeClrType != null)
                 {
-                    if (!entityType.HasSharedClrType
-                        && configurationSource == ConfigurationSource.Explicit
-                        && entityType.GetConfigurationSource() == ConfigurationSource.Explicit)
-                    {
-                        throw new InvalidOperationException("Clashing non shared clr type.");
-                    }
-
                     if (entityType.ClrType != sharedTypeClrType)
                     {
                         throw new InvalidOperationException("Same name used for different shared type entity type.");

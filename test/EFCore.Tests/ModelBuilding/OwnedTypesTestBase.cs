@@ -1570,12 +1570,12 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
             [ConditionalFact]
             public virtual void Can_use_shared_type_entity_type_with_owns_one()
             {
-                var modelBuider = CreateModelBuilder();
+                var modelBuilder = CreateModelBuilder();
 
-                modelBuider.Entity<SharedHolderAlpha>().OwnsOne<SharedTypeEntityType>("Shared1", e => e.SharedReference);
-                modelBuider.Entity<SharedHolderBeta>().OwnsOne<SharedTypeEntityType>("Shared2", e => e.SharedReference, b => b.Property(e => e.Random));
+                modelBuilder.Entity<SharedHolderAlpha>().OwnsOne<SharedTypeEntityType>("Shared1", e => e.SharedReference);
+                modelBuilder.Entity<SharedHolderBeta>().OwnsOne<SharedTypeEntityType>("Shared2", e => e.SharedReference, b => b.Property(e => e.Random));
 
-                Assert.Collection(modelBuider.Model.GetEntityTypes(),
+                Assert.Collection(modelBuilder.Model.GetEntityTypes(),
                     t => { Assert.Equal(typeof(SharedHolderAlpha).FullName, t.Name); },
                     t => { Assert.Equal(typeof(SharedHolderBeta).FullName, t.Name); },
                     t =>
@@ -1595,12 +1595,12 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
             [ConditionalFact]
             public virtual void Can_use_shared_type_entity_type_with_owns_many()
             {
-                var modelBuider = CreateModelBuilder();
+                var modelBuilder = CreateModelBuilder();
 
-                modelBuider.Entity<SharedHolderAlpha>().OwnsMany("Shared1", e => e.SharedCollection);
-                modelBuider.Entity<SharedHolderBeta>().OwnsMany("Shared2", e => e.SharedCollection, b => b.Property(e => e.Random));
+                modelBuilder.Entity<SharedHolderAlpha>().OwnsMany("Shared1", e => e.SharedCollection);
+                modelBuilder.Entity<SharedHolderBeta>().OwnsMany("Shared2", e => e.SharedCollection, b => b.Property(e => e.Random));
 
-                Assert.Collection(modelBuider.Model.GetEntityTypes(),
+                Assert.Collection(modelBuilder.Model.GetEntityTypes(),
                     t => { Assert.Equal(typeof(SharedHolderAlpha).FullName, t.Name); },
                     t => { Assert.Equal(typeof(SharedHolderBeta).FullName, t.Name); },
                     t =>
@@ -1620,9 +1620,9 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
             [ConditionalFact]
             public virtual void Can_use_shared_type_entity_type_with_owns_one_inside_owned_entity()
             {
-                var modelBuider = CreateModelBuilder();
+                var modelBuilder = CreateModelBuilder();
 
-                modelBuider.Entity<SharedHolderAlpha>().OwnsOne<SharedTypeEntityType>(
+                modelBuilder.Entity<SharedHolderAlpha>().OwnsOne<SharedTypeEntityType>(
                     e => e.SharedReference,
                     b =>
                     {
@@ -1630,7 +1630,7 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                         b.OwnsOne<SharedNestedOwnedEntityType>("Shared2", e => e.NestedReference, b => b.Property(e => e.NestedRandom));
                     });
 
-                Assert.Collection(modelBuider.Model.GetEntityTypes(),
+                Assert.Collection(modelBuilder.Model.GetEntityTypes(),
                     t => { Assert.Equal(typeof(SharedHolderAlpha).FullName, t.Name); },
                     t => { Assert.Equal(typeof(SharedTypeEntityType).FullName, t.Name); },
                     t =>
@@ -1650,9 +1650,9 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
             [ConditionalFact]
             public virtual void Can_use_shared_type_entity_type_with_owns_many_inside_owned_entity()
             {
-                var modelBuider = CreateModelBuilder();
+                var modelBuilder = CreateModelBuilder();
 
-                modelBuider.Entity<SharedHolderAlpha>().OwnsOne<SharedTypeEntityType>(
+                modelBuilder.Entity<SharedHolderAlpha>().OwnsOne<SharedTypeEntityType>(
                     e => e.SharedReference,
                     b =>
                     {
@@ -1660,7 +1660,7 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                         b.OwnsMany("Shared2", e => e.NestedCollection, b => b.Property(e => e.NestedRandom));
                     });
 
-                Assert.Collection(modelBuider.Model.GetEntityTypes(),
+                Assert.Collection(modelBuilder.Model.GetEntityTypes(),
                     t => { Assert.Equal(typeof(SharedHolderAlpha).FullName, t.Name); },
                     t => { Assert.Equal(typeof(SharedTypeEntityType).FullName, t.Name); },
                     t =>
@@ -1680,9 +1680,9 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
             [ConditionalFact]
             public virtual void Can_use_shared_type_entity_type_with_has_one_inside_owned_entity()
             {
-                var modelBuider = CreateModelBuilder();
+                var modelBuilder = CreateModelBuilder();
 
-                modelBuider.Entity<SharedHolderAlpha>().OwnsOne<SharedTypeEntityType>(
+                modelBuilder.Entity<SharedHolderAlpha>().OwnsOne<SharedTypeEntityType>(
                     e => e.SharedReference,
                     b =>
                     {
@@ -1690,9 +1690,9 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                         b.HasOne("Shared2", e => e.ReferenceNavigation).WithMany();
                     });
 
-                modelBuider.Entity<NestedReference>("Shared2").Property(e => e.Value);
+                modelBuilder.Entity<NestedReference>("Shared2").Property(e => e.Value);
 
-                Assert.Collection(modelBuider.Model.GetEntityTypes(),
+                Assert.Collection(modelBuilder.Model.GetEntityTypes(),
                     t => { Assert.Equal(typeof(SharedHolderAlpha).FullName, t.Name); },
                     t => { Assert.Equal(typeof(SharedTypeEntityType).FullName, t.Name); },
                     t =>
@@ -1707,6 +1707,49 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                         Assert.True(t.HasSharedClrType);
                         Assert.NotNull(t.FindProperty("Value"));
                     });
+            }
+
+            [ConditionalFact]
+            public virtual void Cannot_add_shared_type_when_non_shared_exists()
+            {
+                var modelBuilder = CreateModelBuilder();
+
+                modelBuilder.Entity<SharedTypeEntityType>();
+
+                Assert.Equal(
+                    "Existing nonshared type",
+                    Assert.Throws<InvalidOperationException>(
+                        () => modelBuilder.Entity<SharedHolderAlpha>().OwnsOne<SharedTypeEntityType>("Shared1", e => e.SharedReference)).Message);
+
+                Assert.Equal(
+                    "Existing nonshared type",
+                    Assert.Throws<InvalidOperationException>(
+                        () => modelBuilder.Entity<SharedHolderAlpha>().OwnsMany("Shared1", e => e.SharedCollection)).Message);
+            }
+
+            [ConditionalFact]
+            public virtual void Cannot_add_shared_type_when_non_shared_exists_nested()
+            {
+                var modelBuilder = CreateModelBuilder();
+                var ownedBuilder = modelBuilder.Entity<SharedHolderAlpha>().OwnsOne<SharedTypeEntityType>(e => e.SharedReference);
+
+                modelBuilder.Entity<SharedNestedOwnedEntityType>();
+                modelBuilder.Entity<NestedReference>();
+
+                Assert.Equal(
+                    "Existing nonshared type",
+                    Assert.Throws<InvalidOperationException>(
+                        () => ownedBuilder.OwnsOne<SharedNestedOwnedEntityType>("Shared1", e => e.NestedReference)).Message);
+
+                Assert.Equal(
+                    "Existing nonshared type",
+                    Assert.Throws<InvalidOperationException>(
+                        () => ownedBuilder.OwnsMany("Shared1", e => e.NestedCollection)).Message);
+
+                Assert.Equal(
+                    "Existing nonshared type",
+                    Assert.Throws<InvalidOperationException>(
+                        () => ownedBuilder.HasOne("Shared1", e => e.ReferenceNavigation).WithOne()).Message);
             }
         }
     }

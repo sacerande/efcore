@@ -230,6 +230,11 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
 
                 if (entityType.HasSharedClrType)
                 {
+                    if (_entityTypes.Any(et => !et.Value.HasSharedClrType && et.Value.ClrType == entityType.ClrType))
+                    {
+                        throw new InvalidOperationException("CannotAddSharedTypeMatchingTypeOfNonShared");
+                    }
+
                     _sharedEntityClrTypes.Add(entityType.ClrType);
                 }
                 else if (_sharedEntityClrTypes.Contains(entityType.ClrType))
