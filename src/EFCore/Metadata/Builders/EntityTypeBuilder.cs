@@ -313,7 +313,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             [NotNull] string navigationName)
             => OwnsOneBuilder(
                 new TypeIdentity(Check.NotEmpty(ownedTypeName, nameof(ownedTypeName))),
-                sharedTypeClrType: null,
+                targetClrType: null,
                 Check.NotEmpty(navigationName, nameof(navigationName)));
 
         /// <summary>
@@ -375,7 +375,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             [NotNull] string navigationName)
             => OwnsOneBuilder(
                 new TypeIdentity(Check.NotNull(ownedType, nameof(ownedType)), (Model)Metadata.Model),
-                sharedTypeClrType: null,
+                targetClrType: null,
                 Check.NotEmpty(navigationName, nameof(navigationName)));
 
         /// <summary>
@@ -410,7 +410,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             Check.NotEmpty(navigationName, nameof(navigationName));
             Check.NotNull(buildAction, nameof(buildAction));
 
-            buildAction(OwnsOneBuilder(new TypeIdentity(ownedTypeName), sharedTypeClrType: null, navigationName));
+            buildAction(OwnsOneBuilder(new TypeIdentity(ownedTypeName), targetClrType: null, navigationName));
             return this;
         }
 
@@ -485,19 +485,19 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             Check.NotEmpty(navigationName, nameof(navigationName));
             Check.NotNull(buildAction, nameof(buildAction));
 
-            buildAction(OwnsOneBuilder(new TypeIdentity(ownedType, (Model)Metadata.Model), sharedTypeClrType: null, navigationName));
+            buildAction(OwnsOneBuilder(new TypeIdentity(ownedType, (Model)Metadata.Model), targetClrType: null, navigationName));
             return this;
         }
 
-        private OwnedNavigationBuilder OwnsOneBuilder(in TypeIdentity ownedType, Type sharedTypeClrType, string navigationName)
+        private OwnedNavigationBuilder OwnsOneBuilder(in TypeIdentity ownedType, Type targetClrType, string navigationName)
         {
             InternalForeignKeyBuilder relationship;
             using (Builder.Metadata.Model.ConventionDispatcher.DelayConventions())
             {
                 relationship = ownedType.Type == null
-                    ? sharedTypeClrType == null
+                    ? targetClrType == null
                         ? Builder.HasOwnership(ownedType.Name, navigationName, ConfigurationSource.Explicit)
-                        : Builder.HasOwnership(ownedType.Name, sharedTypeClrType, navigationName, ConfigurationSource.Explicit)
+                        : Builder.HasOwnership(ownedType.Name, targetClrType, navigationName, ConfigurationSource.Explicit)
                     : Builder.HasOwnership(ownedType.Type, navigationName, ConfigurationSource.Explicit);
                 relationship.IsUnique(true, ConfigurationSource.Explicit);
             }
@@ -535,7 +535,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             [NotNull] string navigationName)
             => OwnsManyBuilder(
                 new TypeIdentity(Check.NotEmpty(ownedTypeName, nameof(ownedTypeName))),
-                sharedTypeClrType: null,
+                targetClrType: null,
                 Check.NotEmpty(navigationName, nameof(navigationName)));
 
         /// <summary>
@@ -597,7 +597,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             [NotNull] string navigationName)
             => OwnsManyBuilder(
                 new TypeIdentity(Check.NotNull(ownedType, nameof(ownedType)), (Model)Metadata.Model),
-                sharedTypeClrType: null,
+                targetClrType: null,
                 Check.NotEmpty(navigationName, nameof(navigationName)));
 
         /// <summary>
@@ -632,7 +632,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             Check.NotEmpty(navigationName, nameof(navigationName));
             Check.NotNull(buildAction, nameof(buildAction));
 
-            buildAction.Invoke(OwnsManyBuilder(new TypeIdentity(ownedTypeName), sharedTypeClrType:null, navigationName));
+            buildAction(OwnsManyBuilder(new TypeIdentity(ownedTypeName), targetClrType:null, navigationName));
             return this;
         }
 
@@ -671,7 +671,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             Check.NotEmpty(navigationName, nameof(navigationName));
             Check.NotNull(buildAction, nameof(buildAction));
 
-            buildAction.Invoke(OwnsManyBuilder(new TypeIdentity(ownedTypeName), clrType, navigationName));
+            buildAction(OwnsManyBuilder(new TypeIdentity(ownedTypeName), clrType, navigationName));
             return this;
         }
 
@@ -707,19 +707,19 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             Check.NotEmpty(navigationName, nameof(navigationName));
             Check.NotNull(buildAction, nameof(buildAction));
 
-            buildAction.Invoke(OwnsManyBuilder(new TypeIdentity(ownedType, (Model)Metadata.Model), sharedTypeClrType: null, navigationName));
+            buildAction.Invoke(OwnsManyBuilder(new TypeIdentity(ownedType, (Model)Metadata.Model), targetClrType: null, navigationName));
             return this;
         }
 
-        private OwnedNavigationBuilder OwnsManyBuilder(in TypeIdentity ownedType, Type sharedTypeClrType, string navigationName)
+        private OwnedNavigationBuilder OwnsManyBuilder(in TypeIdentity ownedType, Type targetClrType, string navigationName)
         {
             InternalForeignKeyBuilder relationship;
             using (Builder.Metadata.Model.ConventionDispatcher.DelayConventions())
             {
                 relationship = ownedType.Type == null
-                    ? sharedTypeClrType == null
+                    ? targetClrType == null
                         ? Builder.HasOwnership(ownedType.Name, navigationName, ConfigurationSource.Explicit)
-                        : Builder.HasOwnership(ownedType.Name, sharedTypeClrType, navigationName, ConfigurationSource.Explicit)
+                        : Builder.HasOwnership(ownedType.Name, targetClrType, navigationName, ConfigurationSource.Explicit)
                     : Builder.HasOwnership(ownedType.Type, navigationName, ConfigurationSource.Explicit);
                 relationship.IsUnique(false, ConfigurationSource.Explicit);
             }

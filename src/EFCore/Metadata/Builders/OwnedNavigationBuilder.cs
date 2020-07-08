@@ -330,7 +330,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             [NotNull] string navigationName)
             => OwnsOneBuilder(
                 new TypeIdentity(Check.NotEmpty(ownedTypeName, nameof(ownedTypeName))),
-                sharedTypeClrType: null,
+                targetClrType: null,
                 Check.NotEmpty(navigationName, nameof(navigationName)));
 
         /// <summary>
@@ -394,7 +394,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             [NotNull] string navigationName)
             => OwnsOneBuilder(
                 new TypeIdentity(Check.NotNull(ownedType, nameof(ownedType)), (Model)OwnedEntityType.Model),
-                sharedTypeClrType: null,
+                targetClrType: null,
                 Check.NotEmpty(navigationName, nameof(navigationName)));
 
         /// <summary>
@@ -432,7 +432,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
 
             using (DependentEntityType.Model.ConventionDispatcher.DelayConventions())
             {
-                buildAction(OwnsOneBuilder(new TypeIdentity(ownedTypeName), sharedTypeClrType: null, navigationName));
+                buildAction(OwnsOneBuilder(new TypeIdentity(ownedTypeName), targetClrType: null, navigationName));
                 return this;
             }
         }
@@ -515,20 +515,20 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
 
             using (DependentEntityType.Model.ConventionDispatcher.DelayConventions())
             {
-                buildAction(OwnsOneBuilder(new TypeIdentity(ownedType, (Model)OwnedEntityType.Model), sharedTypeClrType: null, navigationName));
+                buildAction(OwnsOneBuilder(new TypeIdentity(ownedType, (Model)OwnedEntityType.Model), targetClrType: null, navigationName));
                 return this;
             }
         }
 
-        private OwnedNavigationBuilder OwnsOneBuilder(in TypeIdentity ownedType, Type sharedTypeClrType, string navigationName)
+        private OwnedNavigationBuilder OwnsOneBuilder(in TypeIdentity ownedType, Type targetClrType, string navigationName)
         {
             InternalForeignKeyBuilder relationship;
             using (DependentEntityType.Model.ConventionDispatcher.DelayConventions())
             {
                 relationship = ownedType.Type == null
-                    ? sharedTypeClrType == null
+                    ? targetClrType == null
                         ? DependentEntityType.Builder.HasOwnership(ownedType.Name, navigationName, ConfigurationSource.Explicit)
-                        : DependentEntityType.Builder.HasOwnership(ownedType.Name, sharedTypeClrType, navigationName, ConfigurationSource.Explicit)
+                        : DependentEntityType.Builder.HasOwnership(ownedType.Name, targetClrType, navigationName, ConfigurationSource.Explicit)
                     : DependentEntityType.Builder.HasOwnership(ownedType.Type, navigationName, ConfigurationSource.Explicit);
                 relationship.IsUnique(true, ConfigurationSource.Explicit);
             }
@@ -566,7 +566,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             [NotNull] string navigationName)
             => OwnsManyBuilder(
                 new TypeIdentity(Check.NotEmpty(ownedTypeName, nameof(ownedTypeName))),
-                sharedTypeClrType: null,
+                targetClrType: null,
                 Check.NotEmpty(navigationName, nameof(navigationName)));
 
         /// <summary>
@@ -628,7 +628,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             [NotNull] string navigationName)
             => OwnsManyBuilder(
                 new TypeIdentity(Check.NotNull(ownedType, nameof(ownedType)), DependentEntityType.Model),
-                sharedTypeClrType: null,
+                targetClrType: null,
                 Check.NotEmpty(navigationName, nameof(navigationName)));
 
         /// <summary>
@@ -665,7 +665,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
 
             using (DependentEntityType.Model.ConventionDispatcher.DelayConventions())
             {
-                buildAction(OwnsManyBuilder(new TypeIdentity(ownedTypeName), sharedTypeClrType: null, navigationName));
+                buildAction(OwnsManyBuilder(new TypeIdentity(ownedTypeName), targetClrType: null, navigationName));
                 return this;
             }
         }
@@ -746,20 +746,20 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
 
             using (DependentEntityType.Model.ConventionDispatcher.DelayConventions())
             {
-                buildAction(OwnsManyBuilder(new TypeIdentity(ownedType, DependentEntityType.Model), sharedTypeClrType: null, navigationName));
+                buildAction(OwnsManyBuilder(new TypeIdentity(ownedType, DependentEntityType.Model), targetClrType: null, navigationName));
                 return this;
             }
         }
 
-        private OwnedNavigationBuilder OwnsManyBuilder(in TypeIdentity ownedType, Type sharedTypeClrType, string navigationName)
+        private OwnedNavigationBuilder OwnsManyBuilder(in TypeIdentity ownedType, Type targetClrType, string navigationName)
         {
             InternalForeignKeyBuilder relationship;
             using (DependentEntityType.Model.ConventionDispatcher.DelayConventions())
             {
                 relationship = ownedType.Type == null
-                    ? sharedTypeClrType == null
+                    ? targetClrType == null
                         ? DependentEntityType.Builder.HasOwnership(ownedType.Name, navigationName, ConfigurationSource.Explicit)
-                        : DependentEntityType.Builder.HasOwnership(ownedType.Name, sharedTypeClrType, navigationName, ConfigurationSource.Explicit)
+                        : DependentEntityType.Builder.HasOwnership(ownedType.Name, targetClrType, navigationName, ConfigurationSource.Explicit)
                     : DependentEntityType.Builder.HasOwnership(ownedType.Type, navigationName, ConfigurationSource.Explicit);
                 relationship.IsUnique(false, ConfigurationSource.Explicit);
             }

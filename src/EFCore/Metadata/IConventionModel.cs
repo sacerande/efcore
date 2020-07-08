@@ -50,7 +50,13 @@ namespace Microsoft.EntityFrameworkCore.Metadata
         IConventionEntityType AddEntityType([NotNull] Type clrType, bool fromDataAnnotation = false);
 
         /// <summary>
-        ///     Adds a shared type entity type to the model.
+        ///     <para>
+        ///         Adds a shared type entity type to the model.
+        ///     </para>
+        ///     <para>
+        ///         Shared type entity type is an entity type which can share CLR type with other types in the model but has
+        ///         a unique name and always identified by the name.
+        ///     </para>
         /// </summary>
         /// <param name="name"> The name of the entity to be added. </param>
         /// <param name="clrType"> The CLR class that is used to represent instances of the entity type. </param>

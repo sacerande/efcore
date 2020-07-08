@@ -721,7 +721,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
 
             if (type == null)
             {
-                // This is to popualte Type for convention when removing shared type entity type
+                // This is to populate Type for convention when removing shared type entity type
                 type = _entityTypes.TryGetValue(name, out var existingEntityType)
                     && existingEntityType.HasSharedClrType
                     ? existingEntityType.ClrType

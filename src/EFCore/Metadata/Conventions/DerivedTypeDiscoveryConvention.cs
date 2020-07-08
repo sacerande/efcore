@@ -36,7 +36,9 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Conventions
             var clrType = entityType.ClrType;
             if (clrType == null
                 || entityType.HasSharedClrType
-                || entityType.HasDefiningNavigation())
+                || entityType.HasDefiningNavigation()
+                || entityType.FindDeclaredOwnership() != null
+                || entityType.Model.FindIsOwnedConfigurationSource(clrType) != null)
             {
                 return;
             }

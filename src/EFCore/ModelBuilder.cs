@@ -158,9 +158,17 @@ namespace Microsoft.EntityFrameworkCore
         }
 
         /// <summary>
-        ///     Returns an object that can be used to configure a given entity type in the model.
-        ///     If an entity type with the provided name is not already part of the model,
-        ///     a new entity type that does not have a corresponding CLR type will be added to the model.
+        ///     <para>
+        ///         Returns an object that can be used to configure a given shared type entity type in the model.
+        ///     </para>
+        ///     <para>
+        ///         If an entity type with the provided name is not already part of the model, a new entity type with provided CLR
+        ///         type will be added to the model as shared type entity type.
+        ///     </para>
+        ///     <para>
+        ///         Shared type entity type is an entity type which can share CLR type with other types in the model but has
+        ///         a unique name and always identified by the name.
+        ///     </para>
         /// </summary>
         /// <param name="name"> The name of the entity type to be configured. </param>
         /// <param name="clrType"> The CLR type of the entity type to be configured. </param>
@@ -205,7 +213,7 @@ namespace Microsoft.EntityFrameworkCore
         ///         of the model, it will be added to the model.
         ///     </para>
         ///     <para>
-        ///         This overload allows configuration of the entity type to be done in line in the method call rather
+        ///         This overload allows configuration of the entity type to be done inline in the method call rather
         ///         than being chained after a call to <see cref="Entity{TEntity}()" />. This allows additional
         ///         configuration at the model level to be chained after configuration for the entity type.
         ///     </para>
@@ -322,7 +330,7 @@ namespace Microsoft.EntityFrameworkCore
             => Ignore(typeof(TEntity));
 
         /// <summary>
-        ///     Excludes the given entity type from the model. This method is typically used to remove types from
+        ///     Excludes an entity type with given CLR type from the model. This method is typically used to remove types from
         ///     the model that were added by convention.
         /// </summary>
         /// <param name="type"> The entity type to be removed from the model. </param>
@@ -339,7 +347,7 @@ namespace Microsoft.EntityFrameworkCore
         }
 
         /// <summary>
-        ///     Excludes the given entity type from the model. This method is typically used to remove types from
+        ///     Excludes an entity type with the given name from the model. This method is typically used to remove types from
         ///     the model that were added by convention.
         /// </summary>
         /// <param name="name"> The name of the entity type to be removed from the model. </param>

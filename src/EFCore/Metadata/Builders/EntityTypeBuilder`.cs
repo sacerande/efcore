@@ -441,7 +441,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             Check.NotNull(navigationName, nameof(navigationName));
             Check.NotNull(buildAction, nameof(buildAction));
 
-            buildAction.Invoke(OwnsOneBuilder<TRelatedEntity>(targetTypeName: null, new MemberIdentity(navigationName)));
+            buildAction(OwnsOneBuilder<TRelatedEntity>(targetTypeName: null, new MemberIdentity(navigationName)));
             return this;
         }
 
@@ -479,7 +479,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             Check.NotEmpty(navigationName, nameof(navigationName));
             Check.NotNull(buildAction, nameof(buildAction));
 
-            buildAction.Invoke(OwnsOneBuilder<TRelatedEntity>(targetTypeName, new MemberIdentity(navigationName)));
+            buildAction(OwnsOneBuilder<TRelatedEntity>(targetTypeName, new MemberIdentity(navigationName)));
             return this;
         }
 
@@ -515,7 +515,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             Check.NotNull(navigationExpression, nameof(navigationExpression));
             Check.NotNull(buildAction, nameof(buildAction));
 
-            buildAction.Invoke(OwnsOneBuilder<TRelatedEntity>(targetTypeName: null, new MemberIdentity(navigationExpression.GetMemberAccess())));
+            buildAction(OwnsOneBuilder<TRelatedEntity>(targetTypeName: null, new MemberIdentity(navigationExpression.GetMemberAccess())));
             return this;
         }
 
@@ -554,7 +554,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             Check.NotNull(navigationExpression, nameof(navigationExpression));
             Check.NotNull(buildAction, nameof(buildAction));
 
-            buildAction.Invoke(OwnsOneBuilder<TRelatedEntity>(targetTypeName, new MemberIdentity(navigationExpression.GetMemberAccess())));
+            buildAction(OwnsOneBuilder<TRelatedEntity>(targetTypeName, new MemberIdentity(navigationExpression.GetMemberAccess())));
             return this;
         }
 
@@ -565,12 +565,8 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             using (var batch = Builder.Metadata.Model.ConventionDispatcher.DelayConventions())
             {
                 relationship = targetTypeName == null
-                    ? navigation.MemberInfo == null
-                        ? Builder.HasOwnership(typeof(TRelatedEntity), navigation.Name, ConfigurationSource.Explicit)
-                        : Builder.HasOwnership(typeof(TRelatedEntity), navigation.MemberInfo, ConfigurationSource.Explicit)
-                    : navigation.MemberInfo == null
-                        ? Builder.HasOwnership(targetTypeName, typeof(TRelatedEntity), navigation.Name, ConfigurationSource.Explicit)
-                        : Builder.HasOwnership(targetTypeName, typeof(TRelatedEntity), navigation.MemberInfo, ConfigurationSource.Explicit);
+                    ? Builder.HasOwnership(typeof(TRelatedEntity), navigation, ConfigurationSource.Explicit)
+                    : Builder.HasOwnership(targetTypeName, typeof(TRelatedEntity), navigation, ConfigurationSource.Explicit);
 
                 relationship.IsUnique(true, ConfigurationSource.Explicit);
                 relationship = (InternalForeignKeyBuilder)batch.Run(relationship.Metadata).Builder;
@@ -730,7 +726,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             Check.NotEmpty(navigationName, nameof(navigationName));
             Check.NotNull(buildAction, nameof(buildAction));
 
-            buildAction.Invoke(OwnsManyBuilder<TRelatedEntity>(targetTypeName: null, new MemberIdentity(navigationName)));
+            buildAction(OwnsManyBuilder<TRelatedEntity>(targetTypeName: null, new MemberIdentity(navigationName)));
             return this;
         }
 
@@ -768,7 +764,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             Check.NotEmpty(navigationName, nameof(navigationName));
             Check.NotNull(buildAction, nameof(buildAction));
 
-            buildAction.Invoke(OwnsManyBuilder<TRelatedEntity>(targetTypeName, new MemberIdentity(navigationName)));
+            buildAction(OwnsManyBuilder<TRelatedEntity>(targetTypeName, new MemberIdentity(navigationName)));
             return this;
         }
 
@@ -804,7 +800,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             Check.NotNull(navigationExpression, nameof(navigationExpression));
             Check.NotNull(buildAction, nameof(buildAction));
 
-            buildAction.Invoke(OwnsManyBuilder<TRelatedEntity>(targetTypeName: null, new MemberIdentity(navigationExpression.GetMemberAccess())));
+            buildAction(OwnsManyBuilder<TRelatedEntity>(targetTypeName: null, new MemberIdentity(navigationExpression.GetMemberAccess())));
             return this;
         }
 
@@ -843,7 +839,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             Check.NotNull(navigationExpression, nameof(navigationExpression));
             Check.NotNull(buildAction, nameof(buildAction));
 
-            buildAction.Invoke(OwnsManyBuilder<TRelatedEntity>(targetTypeName, new MemberIdentity(navigationExpression.GetMemberAccess())));
+            buildAction(OwnsManyBuilder<TRelatedEntity>(targetTypeName, new MemberIdentity(navigationExpression.GetMemberAccess())));
             return this;
         }
 
@@ -854,12 +850,8 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             using (var batch = Builder.Metadata.Model.ConventionDispatcher.DelayConventions())
             {
                 relationship = targetTypeName == null
-                    ? navigation.MemberInfo == null
-                        ? Builder.HasOwnership(typeof(TRelatedEntity), navigation.Name, ConfigurationSource.Explicit)
-                        : Builder.HasOwnership(typeof(TRelatedEntity), navigation.MemberInfo, ConfigurationSource.Explicit)
-                    : navigation.MemberInfo == null
-                        ? Builder.HasOwnership(targetTypeName, typeof(TRelatedEntity), navigation.Name, ConfigurationSource.Explicit)
-                        : Builder.HasOwnership(targetTypeName, typeof(TRelatedEntity), navigation.MemberInfo, ConfigurationSource.Explicit);
+                    ? Builder.HasOwnership(typeof(TRelatedEntity), navigation, ConfigurationSource.Explicit)
+                    : Builder.HasOwnership(targetTypeName, typeof(TRelatedEntity), navigation, ConfigurationSource.Explicit);
 
                 relationship.IsUnique(false, ConfigurationSource.Explicit);
                 relationship = (InternalForeignKeyBuilder)batch.Run(relationship.Metadata).Builder;

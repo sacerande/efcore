@@ -513,12 +513,8 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             using (var batch = DependentEntityType.Model.ConventionDispatcher.DelayConventions())
             {
                 relationship = targetTypeName == null
-                      ? navigation.MemberInfo == null
-                          ? DependentEntityType.Builder.HasOwnership(typeof(TNewDependentEntity), navigation.Name, ConfigurationSource.Explicit)
-                          : DependentEntityType.Builder.HasOwnership(typeof(TNewDependentEntity), navigation.MemberInfo, ConfigurationSource.Explicit)
-                      : navigation.MemberInfo == null
-                          ? DependentEntityType.Builder.HasOwnership(targetTypeName, typeof(TNewDependentEntity), navigation.Name, ConfigurationSource.Explicit)
-                          : DependentEntityType.Builder.HasOwnership(targetTypeName, typeof(TNewDependentEntity), navigation.MemberInfo, ConfigurationSource.Explicit);
+                      ? DependentEntityType.Builder.HasOwnership(typeof(TNewDependentEntity), navigation, ConfigurationSource.Explicit)
+                      : DependentEntityType.Builder.HasOwnership(targetTypeName, typeof(TNewDependentEntity), navigation, ConfigurationSource.Explicit);
 
                 relationship.IsUnique(true, ConfigurationSource.Explicit);
                 relationship = (InternalForeignKeyBuilder)batch.Run(relationship.Metadata).Builder;
@@ -815,12 +811,8 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             using (var batch = DependentEntityType.Model.ConventionDispatcher.DelayConventions())
             {
                 relationship = targetTypeName == null
-                      ? navigation.MemberInfo == null
-                          ? DependentEntityType.Builder.HasOwnership(typeof(TNewRelatedEntity), navigation.Name, ConfigurationSource.Explicit)
-                          : DependentEntityType.Builder.HasOwnership(typeof(TNewRelatedEntity), navigation.MemberInfo, ConfigurationSource.Explicit)
-                      : navigation.MemberInfo == null
-                          ? DependentEntityType.Builder.HasOwnership(targetTypeName, typeof(TNewRelatedEntity), navigation.Name, ConfigurationSource.Explicit)
-                          : DependentEntityType.Builder.HasOwnership(targetTypeName, typeof(TNewRelatedEntity), navigation.MemberInfo, ConfigurationSource.Explicit);
+                      ? DependentEntityType.Builder.HasOwnership(typeof(TNewRelatedEntity), navigation, ConfigurationSource.Explicit)
+                      : DependentEntityType.Builder.HasOwnership(targetTypeName, typeof(TNewRelatedEntity), navigation, ConfigurationSource.Explicit);
 
                 relationship.IsUnique(false, ConfigurationSource.Explicit);
                 relationship = (InternalForeignKeyBuilder)batch.Run(relationship.Metadata).Builder;
