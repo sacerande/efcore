@@ -51,6 +51,21 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
             public override void Can_configure_owned_type_collection_with_one_call_afterwards()
             {
             }
+
+            //Shadow navigations not supported #3864
+            public override void Can_use_shared_type_entity_type_with_owns_one_inside_owned_entity()
+            {
+            }
+
+            //Shadow navigations not supported #3864
+            public override void Can_use_shared_type_entity_type_with_owns_many_inside_owned_entity()
+            {
+            }
+
+            //Shadow navigations not supported #3864
+            public override void Can_use_shared_type_entity_type_with_has_one_inside_owned_entity()
+            {
+            }
         }
 
         public class NonGenericStringOneToManyType : OneToManyTestBase

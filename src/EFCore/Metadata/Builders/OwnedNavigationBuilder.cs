@@ -526,7 +526,9 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             using (DependentEntityType.Model.ConventionDispatcher.DelayConventions())
             {
                 relationship = ownedType.Type == null
-                    ? DependentEntityType.Builder.HasOwnership(ownedType.Name, navigationName, ConfigurationSource.Explicit)
+                    ? sharedTypeClrType == null
+                        ? DependentEntityType.Builder.HasOwnership(ownedType.Name, navigationName, ConfigurationSource.Explicit)
+                        : DependentEntityType.Builder.HasOwnership(ownedType.Name, sharedTypeClrType, navigationName, ConfigurationSource.Explicit)
                     : DependentEntityType.Builder.HasOwnership(ownedType.Type, navigationName, ConfigurationSource.Explicit);
                 relationship.IsUnique(true, ConfigurationSource.Explicit);
             }

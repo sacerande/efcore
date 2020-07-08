@@ -2002,6 +2002,22 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                 Assert.Equal(PropertyAccessMode.Field, dependent.Metadata.GetPropertyAccessMode());
                 Assert.Equal(PropertyAccessMode.Property, dependent.Metadata.FindNavigation("OneToManyPrincipal").GetPropertyAccessMode());
             }
+
+            [ConditionalFact]
+            public virtual void Navigation_to_shared_type()
+            {
+                var modelBuilder = CreateModelBuilder();
+
+                modelBuilder.Entity<SharedHolderAlpha>()
+                    .HasMany("Shared1", e => e.SharedCollection)
+                    .WithOne();
+
+                modelBuilder.Entity<SharedHolderBeta>()
+                    .HasMany("Shared2", e => e.SharedCollection)
+                    .WithOne();
+
+                Assert.Equal(2, modelBuilder.Model.GetEntityTypes().Where(e => e.HasSharedClrType).Count());
+            }
         }
     }
 }

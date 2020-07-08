@@ -1568,56 +1568,144 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
             }
 
             [ConditionalFact]
-            public virtual void Can_use_shared_type_entity_type_with_owns_one_expression()
+            public virtual void Can_use_shared_type_entity_type_with_owns_one()
             {
                 var modelBuider = CreateModelBuilder();
 
-                modelBuider.Ignore<CustomerDetails>();
-                modelBuider.Ignore<OrderDetails>();
-                modelBuider.Entity<Customer>().OwnsOne<SharedTypeEntityType>("Shared1", e => e.Shared);
-                modelBuider.Entity<Order>().OwnsOne<SharedTypeEntityType>("Shared2", e => e.Shared, b => b.Ignore(e => e.Random));
+                modelBuider.Entity<SharedHolderAlpha>().OwnsOne<SharedTypeEntityType>("Shared1", e => e.SharedReference);
+                modelBuider.Entity<SharedHolderBeta>().OwnsOne<SharedTypeEntityType>("Shared2", e => e.SharedReference, b => b.Property(e => e.Random));
 
                 Assert.Collection(modelBuider.Model.GetEntityTypes(),
-                    t => { Assert.Equal(typeof(Customer).FullName, t.Name); },
-                    t => { Assert.Equal(typeof(Order).FullName, t.Name); },
+                    t => { Assert.Equal(typeof(SharedHolderAlpha).FullName, t.Name); },
+                    t => { Assert.Equal(typeof(SharedHolderBeta).FullName, t.Name); },
                     t =>
                     {
                         Assert.Equal("Shared1", t.Name);
                         Assert.True(t.HasSharedClrType);
-                        Assert.NotNull(t.FindProperty("Random"));
+                        Assert.Null(t.FindProperty("Random"));
                     },
                     t =>
                     {
                         Assert.Equal("Shared2", t.Name);
                         Assert.True(t.HasSharedClrType);
-                        Assert.Null(t.FindProperty("Random"));
+                        Assert.NotNull(t.FindProperty("Random"));
                     });
             }
 
             [ConditionalFact]
-            public virtual void Can_use_shared_type_entity_type_with_owns_one_string()
+            public virtual void Can_use_shared_type_entity_type_with_owns_many()
             {
                 var modelBuider = CreateModelBuilder();
 
-                modelBuider.Ignore<CustomerDetails>();
-                modelBuider.Ignore<OrderDetails>();
-                modelBuider.Entity<Customer>().OwnsOne<SharedTypeEntityType>("Shared1", "Shared");
-                modelBuider.Entity<Order>().OwnsOne<SharedTypeEntityType>("Shared2", "Shared", b => b.Ignore(e => e.Random));
+                modelBuider.Entity<SharedHolderAlpha>().OwnsMany("Shared1", e => e.SharedCollection);
+                modelBuider.Entity<SharedHolderBeta>().OwnsMany("Shared2", e => e.SharedCollection, b => b.Property(e => e.Random));
 
                 Assert.Collection(modelBuider.Model.GetEntityTypes(),
-                    t => { Assert.Equal(typeof(Customer).FullName, t.Name); },
-                    t => { Assert.Equal(typeof(Order).FullName, t.Name); },
+                    t => { Assert.Equal(typeof(SharedHolderAlpha).FullName, t.Name); },
+                    t => { Assert.Equal(typeof(SharedHolderBeta).FullName, t.Name); },
                     t =>
                     {
                         Assert.Equal("Shared1", t.Name);
                         Assert.True(t.HasSharedClrType);
-                        Assert.NotNull(t.FindProperty("Random"));
+                        Assert.Null(t.FindProperty("Random"));
                     },
                     t =>
                     {
                         Assert.Equal("Shared2", t.Name);
                         Assert.True(t.HasSharedClrType);
-                        Assert.Null(t.FindProperty("Random"));
+                        Assert.NotNull(t.FindProperty("Random"));
+                    });
+            }
+
+            [ConditionalFact]
+            public virtual void Can_use_shared_type_entity_type_with_owns_one_inside_owned_entity()
+            {
+                var modelBuider = CreateModelBuilder();
+
+                modelBuider.Entity<SharedHolderAlpha>().OwnsOne<SharedTypeEntityType>(
+                    e => e.SharedReference,
+                    b =>
+                    {
+                        b.OwnsOne<SharedNestedOwnedEntityType>("Shared1", e => e.NestedReference);
+                        b.OwnsOne<SharedNestedOwnedEntityType>("Shared2", e => e.NestedReference, b => b.Property(e => e.NestedRandom));
+                    });
+
+                Assert.Collection(modelBuider.Model.GetEntityTypes(),
+                    t => { Assert.Equal(typeof(SharedHolderAlpha).FullName, t.Name); },
+                    t => { Assert.Equal(typeof(SharedTypeEntityType).FullName, t.Name); },
+                    t =>
+                    {
+                        Assert.Equal("Shared1", t.Name);
+                        Assert.True(t.HasSharedClrType);
+                        Assert.Null(t.FindProperty("NestedRandom"));
+                    },
+                    t =>
+                    {
+                        Assert.Equal("Shared2", t.Name);
+                        Assert.True(t.HasSharedClrType);
+                        Assert.NotNull(t.FindProperty("NestedRandom"));
+                    });
+            }
+
+            [ConditionalFact]
+            public virtual void Can_use_shared_type_entity_type_with_owns_many_inside_owned_entity()
+            {
+                var modelBuider = CreateModelBuilder();
+
+                modelBuider.Entity<SharedHolderAlpha>().OwnsOne<SharedTypeEntityType>(
+                    e => e.SharedReference,
+                    b =>
+                    {
+                        b.OwnsMany("Shared1", e => e.NestedCollection);
+                        b.OwnsMany("Shared2", e => e.NestedCollection, b => b.Property(e => e.NestedRandom));
+                    });
+
+                Assert.Collection(modelBuider.Model.GetEntityTypes(),
+                    t => { Assert.Equal(typeof(SharedHolderAlpha).FullName, t.Name); },
+                    t => { Assert.Equal(typeof(SharedTypeEntityType).FullName, t.Name); },
+                    t =>
+                    {
+                        Assert.Equal("Shared1", t.Name);
+                        Assert.True(t.HasSharedClrType);
+                        Assert.Null(t.FindProperty("NestedRandom"));
+                    },
+                    t =>
+                    {
+                        Assert.Equal("Shared2", t.Name);
+                        Assert.True(t.HasSharedClrType);
+                        Assert.NotNull(t.FindProperty("NestedRandom"));
+                    });
+            }
+
+            [ConditionalFact]
+            public virtual void Can_use_shared_type_entity_type_with_has_one_inside_owned_entity()
+            {
+                var modelBuider = CreateModelBuilder();
+
+                modelBuider.Entity<SharedHolderAlpha>().OwnsOne<SharedTypeEntityType>(
+                    e => e.SharedReference,
+                    b =>
+                    {
+                        b.HasOne("Shared1", e => e.ReferenceNavigation).WithOne();
+                        b.HasOne("Shared2", e => e.ReferenceNavigation).WithMany();
+                    });
+
+                modelBuider.Entity<NestedReference>("Shared2").Property(e => e.Value);
+
+                Assert.Collection(modelBuider.Model.GetEntityTypes(),
+                    t => { Assert.Equal(typeof(SharedHolderAlpha).FullName, t.Name); },
+                    t => { Assert.Equal(typeof(SharedTypeEntityType).FullName, t.Name); },
+                    t =>
+                    {
+                        Assert.Equal("Shared1", t.Name);
+                        Assert.True(t.HasSharedClrType);
+                        Assert.Null(t.FindProperty("Value"));
+                    },
+                    t =>
+                    {
+                        Assert.Equal("Shared2", t.Name);
+                        Assert.True(t.HasSharedClrType);
+                        Assert.NotNull(t.FindProperty("Value"));
                     });
             }
         }

@@ -853,11 +853,14 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             InternalForeignKeyBuilder relationship;
             using (var batch = Builder.Metadata.Model.ConventionDispatcher.DelayConventions())
             {
-                relationship = navigation.MemberInfo == null
-                    ? targetTypeName == null
+                relationship = targetTypeName == null
+                    ? navigation.MemberInfo == null
                         ? Builder.HasOwnership(typeof(TRelatedEntity), navigation.Name, ConfigurationSource.Explicit)
-                        : Builder.HasOwnership(targetTypeName, typeof(TRelatedEntity), navigation.Name, ConfigurationSource.Explicit)
-                    : Builder.HasOwnership(typeof(TRelatedEntity), (PropertyInfo)navigation.MemberInfo, ConfigurationSource.Explicit);
+                        : Builder.HasOwnership(typeof(TRelatedEntity), navigation.MemberInfo, ConfigurationSource.Explicit)
+                    : navigation.MemberInfo == null
+                        ? Builder.HasOwnership(targetTypeName, typeof(TRelatedEntity), navigation.Name, ConfigurationSource.Explicit)
+                        : Builder.HasOwnership(targetTypeName, typeof(TRelatedEntity), navigation.MemberInfo, ConfigurationSource.Explicit);
+
                 relationship.IsUnique(false, ConfigurationSource.Explicit);
                 relationship = (InternalForeignKeyBuilder)batch.Run(relationship.Metadata).Builder;
             }
@@ -1035,7 +1038,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             Check.NotEmpty(targetTypeName, nameof(targetTypeName));
 
             var navigationMember = navigationExpression?.GetMemberAccess();
-            var relatedEntityType = FindRelatedEntityType(typeof(TRelatedEntity), navigationMember?.GetSimpleMemberName());
+            var relatedEntityType = FindRelatedEntityType(targetTypeName, typeof(TRelatedEntity), navigationMember?.GetSimpleMemberName());
             var foreignKey = HasOneBuilder(
                 MemberIdentity.Create(navigationMember), relatedEntityType);
 

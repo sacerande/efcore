@@ -512,12 +512,14 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             InternalForeignKeyBuilder relationship;
             using (var batch = DependentEntityType.Model.ConventionDispatcher.DelayConventions())
             {
-                relationship = navigation.MemberInfo == null
-                    ? targetTypeName == null
-                        ? DependentEntityType.Builder.HasOwnership(typeof(TNewDependentEntity), navigation.Name, ConfigurationSource.Explicit)
-                        : DependentEntityType.Builder.HasOwnership(targetTypeName, typeof(TNewDependentEntity), navigation.Name, ConfigurationSource.Explicit)
-                    : DependentEntityType.Builder.HasOwnership(
-                        typeof(TNewDependentEntity), (PropertyInfo)navigation.MemberInfo, ConfigurationSource.Explicit);
+                relationship = targetTypeName == null
+                      ? navigation.MemberInfo == null
+                          ? DependentEntityType.Builder.HasOwnership(typeof(TNewDependentEntity), navigation.Name, ConfigurationSource.Explicit)
+                          : DependentEntityType.Builder.HasOwnership(typeof(TNewDependentEntity), navigation.MemberInfo, ConfigurationSource.Explicit)
+                      : navigation.MemberInfo == null
+                          ? DependentEntityType.Builder.HasOwnership(targetTypeName, typeof(TNewDependentEntity), navigation.Name, ConfigurationSource.Explicit)
+                          : DependentEntityType.Builder.HasOwnership(targetTypeName, typeof(TNewDependentEntity), navigation.MemberInfo, ConfigurationSource.Explicit);
+
                 relationship.IsUnique(true, ConfigurationSource.Explicit);
                 relationship = (InternalForeignKeyBuilder)batch.Run(relationship.Metadata).Builder;
             }
@@ -812,12 +814,14 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             InternalForeignKeyBuilder relationship;
             using (var batch = DependentEntityType.Model.ConventionDispatcher.DelayConventions())
             {
-                relationship = navigation.MemberInfo == null
-                    ? targetTypeName == null
-                        ? DependentEntityType.Builder.HasOwnership(typeof(TNewRelatedEntity), navigation.Name, ConfigurationSource.Explicit)
-                        : DependentEntityType.Builder.HasOwnership(targetTypeName, typeof(TNewRelatedEntity), navigation.Name, ConfigurationSource.Explicit)
-                    : DependentEntityType.Builder.HasOwnership(
-                        typeof(TNewRelatedEntity), (PropertyInfo)navigation.MemberInfo, ConfigurationSource.Explicit);
+                relationship = targetTypeName == null
+                      ? navigation.MemberInfo == null
+                          ? DependentEntityType.Builder.HasOwnership(typeof(TNewRelatedEntity), navigation.Name, ConfigurationSource.Explicit)
+                          : DependentEntityType.Builder.HasOwnership(typeof(TNewRelatedEntity), navigation.MemberInfo, ConfigurationSource.Explicit)
+                      : navigation.MemberInfo == null
+                          ? DependentEntityType.Builder.HasOwnership(targetTypeName, typeof(TNewRelatedEntity), navigation.Name, ConfigurationSource.Explicit)
+                          : DependentEntityType.Builder.HasOwnership(targetTypeName, typeof(TNewRelatedEntity), navigation.MemberInfo, ConfigurationSource.Explicit);
+
                 relationship.IsUnique(false, ConfigurationSource.Explicit);
                 relationship = (InternalForeignKeyBuilder)batch.Run(relationship.Metadata).Builder;
             }

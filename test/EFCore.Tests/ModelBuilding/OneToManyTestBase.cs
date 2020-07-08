@@ -2577,6 +2577,22 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                         .UsePropertyAccessMode(PropertyAccessMode.Property)
                         ).Message);
             }
+
+            [ConditionalFact]
+            public virtual void Navigation_to_shared_type()
+            {
+                var modelBuilder = CreateModelBuilder();
+
+                modelBuilder.Entity<SharedHolderAlpha>()
+                    .HasOne<SharedTypeEntityType>("Shared1", e => e.SharedReference)
+                    .WithMany();
+
+                modelBuilder.Entity<SharedHolderBeta>()
+                    .HasOne<SharedTypeEntityType>("Shared2", e => e.SharedReference)
+                    .WithMany();
+
+                Assert.Equal(2, modelBuilder.Model.GetEntityTypes().Where(e => e.HasSharedClrType).Count());
+            }
         }
     }
 }

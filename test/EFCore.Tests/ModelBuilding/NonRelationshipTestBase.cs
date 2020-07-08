@@ -1555,12 +1555,12 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                 var shared1 = modelBuilder.Model.FindEntityType("Shared1");
                 Assert.NotNull(shared1);
                 Assert.True(shared1.HasSharedClrType);
-                Assert.Empty(shared1.GetProperties());
+                Assert.Null(shared1.FindProperty("Id"));
 
                 var shared2 = modelBuilder.Model.FindEntityType("Shared2");
                 Assert.NotNull(shared2);
                 Assert.True(shared2.HasSharedClrType);
-                Assert.Equal("Id", Assert.Single(shared2.GetProperties()).Name);
+                Assert.NotNull(shared2.FindProperty("Id"));
             }
         }
     }
