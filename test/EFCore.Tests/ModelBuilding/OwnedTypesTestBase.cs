@@ -1566,6 +1566,60 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                                 .Entity<OneToManyNavPrincipalOwner>()
                                 .OwnsOne<OwnedOneToManyNavDependent>("OwnedDependents")).Message);
             }
+
+            [ConditionalFact]
+            public virtual void Can_use_shared_type_entity_type_with_owns_one_expression()
+            {
+                var modelBuider = CreateModelBuilder();
+
+                modelBuider.Ignore<CustomerDetails>();
+                modelBuider.Ignore<OrderDetails>();
+                modelBuider.Entity<Customer>().OwnsOne<SharedTypeEntityType>("Shared1", e => e.Shared);
+                modelBuider.Entity<Order>().OwnsOne<SharedTypeEntityType>("Shared2", e => e.Shared, b => b.Ignore(e => e.Random));
+
+                Assert.Collection(modelBuider.Model.GetEntityTypes(),
+                    t => { Assert.Equal(typeof(Customer).FullName, t.Name); },
+                    t => { Assert.Equal(typeof(Order).FullName, t.Name); },
+                    t =>
+                    {
+                        Assert.Equal("Shared1", t.Name);
+                        Assert.True(t.HasSharedClrType);
+                        Assert.NotNull(t.FindProperty("Random"));
+                    },
+                    t =>
+                    {
+                        Assert.Equal("Shared2", t.Name);
+                        Assert.True(t.HasSharedClrType);
+                        Assert.Null(t.FindProperty("Random"));
+                    });
+            }
+
+            [ConditionalFact]
+            public virtual void Can_use_shared_type_entity_type_with_owns_one_string()
+            {
+                var modelBuider = CreateModelBuilder();
+
+                modelBuider.Ignore<CustomerDetails>();
+                modelBuider.Ignore<OrderDetails>();
+                modelBuider.Entity<Customer>().OwnsOne<SharedTypeEntityType>("Shared1", "Shared");
+                modelBuider.Entity<Order>().OwnsOne<SharedTypeEntityType>("Shared2", "Shared", b => b.Ignore(e => e.Random));
+
+                Assert.Collection(modelBuider.Model.GetEntityTypes(),
+                    t => { Assert.Equal(typeof(Customer).FullName, t.Name); },
+                    t => { Assert.Equal(typeof(Order).FullName, t.Name); },
+                    t =>
+                    {
+                        Assert.Equal("Shared1", t.Name);
+                        Assert.True(t.HasSharedClrType);
+                        Assert.NotNull(t.FindProperty("Random"));
+                    },
+                    t =>
+                    {
+                        Assert.Equal("Shared2", t.Name);
+                        Assert.True(t.HasSharedClrType);
+                        Assert.Null(t.FindProperty("Random"));
+                    });
+            }
         }
     }
 }

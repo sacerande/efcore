@@ -98,6 +98,14 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
             public ICollection<SpecialOrder> SomeOrders { get; set; }
 
             public CustomerDetails Details { get; set; }
+
+            [NotMapped]
+            public SharedTypeEntityType Shared { get; set; }
+        }
+
+        protected class SharedTypeEntityType
+        {
+            public int Random { get; set; }
         }
 
         [NotMapped]
@@ -144,6 +152,8 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
             public OrderCombination OrderCombination { get; set; }
             public OrderDetails Details { get; set; }
             public ICollection<Product> Products { get; set; }
+            [NotMapped]
+            public SharedTypeEntityType Shared { get; set; }
 
             public event PropertyChangedEventHandler PropertyChanged;
             protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

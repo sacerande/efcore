@@ -495,6 +495,23 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
         /// <summary>
         ///     Configures a relationship where the target entity is owned by (or part of) this entity.
         /// </summary>
+        /// <param name="targetEntityTypeName"> The name of the entity type that this relationship targets. </param>
+        /// <param name="targetEntityClrType"> The CLR type of the entity type that this relationship targets. </param>
+        /// <param name="navigationToTarget"> The navigation property on this entity type that is part of the relationship. </param>
+        /// <param name="fromDataAnnotation"> Indicates whether the configuration was specified using a data annotation. </param>
+        /// <returns>
+        ///     An object that can be used to configure the relationship if it exists on the entity type,
+        ///     <see langword="null" /> otherwise.
+        /// </returns>
+        IConventionForeignKeyBuilder HasOwnership(
+            [NotNull] string targetEntityTypeName,
+            [NotNull] Type targetEntityClrType,
+            [NotNull] MemberInfo navigationToTarget,
+            bool fromDataAnnotation = false);
+
+        /// <summary>
+        ///     Configures a relationship where the target entity is owned by (or part of) this entity.
+        /// </summary>
         /// <param name="targetEntityType"> The type that this relationship targets. </param>
         /// <param name="navigationToTargetName"> The name of the navigation property on this entity type that is part of the relationship. </param>
         /// <param name="inverseNavigationName">
@@ -530,6 +547,20 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             [NotNull] Type targetEntityType,
             [NotNull] MemberInfo navigationToTarget,
             [CanBeNull] MemberInfo inverseNavigation,
+            bool fromDataAnnotation = false);
+
+        /// <summary>
+        ///     Configures a relationship where the target entity is owned by (or part of) this entity.
+        /// </summary>
+        /// <param name="targetEntityTypeName"> The name of the entity type that this relationship targets. </param>
+        /// <param name="targetEntityClrType"> The type that this relationship targets. </param>
+        /// <param name="navigationToTargetName"> The name of the navigation property on this entity type that is part of the relationship. </param>
+        /// <param name="fromDataAnnotation"> Indicates whether the configuration was specified using a data annotation. </param>
+        /// <returns> An object that can be used to configure the relationship. </returns>
+        IConventionForeignKeyBuilder HasOwnership(
+            [NotNull] string targetEntityTypeName,
+            [NotNull] Type targetEntityClrType,
+            [NotNull] string navigationToTargetName,
             bool fromDataAnnotation = false);
 
         /// <summary>

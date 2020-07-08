@@ -74,6 +74,11 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                 Expression<Func<TEntity, TRelatedEntity>> navigationExpression)
                 => new GenericTypeTestOwnedNavigationBuilder<TEntity, TRelatedEntity>(EntityTypeBuilder.OwnsOne(navigationExpression));
 
+            public override TestOwnedNavigationBuilder<TEntity, TRelatedEntity> OwnsOne<TRelatedEntity>(
+                string targetTypeName,
+                Expression<Func<TEntity, TRelatedEntity>> navigationExpression)
+                => new GenericTypeTestOwnedNavigationBuilder<TEntity, TRelatedEntity>(EntityTypeBuilder.OwnsOne(targetTypeName, navigationExpression));
+
             public override TestEntityTypeBuilder<TEntity> OwnsOne<TRelatedEntity>(
                 Expression<Func<TEntity, TRelatedEntity>> navigationExpression,
                 Action<TestOwnedNavigationBuilder<TEntity, TRelatedEntity>> buildAction)
@@ -82,10 +87,26 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                         navigationExpression,
                         r => buildAction(new GenericTypeTestOwnedNavigationBuilder<TEntity, TRelatedEntity>(r))));
 
+            public override TestEntityTypeBuilder<TEntity> OwnsOne<TRelatedEntity>(
+                string targetTypeName,
+                Expression<Func<TEntity, TRelatedEntity>> navigationExpression,
+                Action<TestOwnedNavigationBuilder<TEntity, TRelatedEntity>> buildAction)
+                => Wrap(
+                    EntityTypeBuilder.OwnsOne(
+                        targetTypeName,
+                        navigationExpression,
+                        r => buildAction(new GenericTypeTestOwnedNavigationBuilder<TEntity, TRelatedEntity>(r))));
+
             public override TestReferenceNavigationBuilder<TEntity, TRelatedEntity> HasOne<TRelatedEntity>(
                 Expression<Func<TEntity, TRelatedEntity>> navigationExpression = null)
                 => new GenericTypeTestReferenceNavigationBuilder<TEntity, TRelatedEntity>(
                     EntityTypeBuilder.HasOne(navigationExpression));
+
+            public override TestReferenceNavigationBuilder<TEntity, TRelatedEntity> HasOne<TRelatedEntity>(
+                string targetTypeName,
+                Expression<Func<TEntity, TRelatedEntity>> navigationExpression = null)
+                => new GenericTypeTestReferenceNavigationBuilder<TEntity, TRelatedEntity>(
+                    EntityTypeBuilder.HasOne(targetTypeName, navigationExpression));
         }
 
         private class GenericTypeTestReferenceNavigationBuilder<TEntity, TRelatedEntity> : GenericTestReferenceNavigationBuilder<TEntity,

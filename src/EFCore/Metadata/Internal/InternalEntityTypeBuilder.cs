@@ -2952,8 +2952,23 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
             [NotNull] string navigationName,
             ConfigurationSource configurationSource)
             => HasOwnership(
-                new TypeIdentity(targetEntityTypeName), MemberIdentity.Create(navigationName),
-                inverse: null, configurationSource);
+                new TypeIdentity(targetEntityTypeName), sharedTypeClrType: null,
+                MemberIdentity.Create(navigationName), inverse: null, configurationSource);
+
+        /// <summary>
+        ///     This is an internal API that supports the Entity Framework Core infrastructure and not subject to
+        ///     the same compatibility standards as public APIs. It may be changed or removed without notice in
+        ///     any release. You should only use it directly in your code with extreme caution and knowing that
+        ///     doing so can result in application failures when updating to a new Entity Framework Core release.
+        /// </summary>
+        public virtual InternalForeignKeyBuilder HasOwnership(
+            [NotNull] string targetEntityTypeName,
+            [NotNull] Type clrType,
+            [NotNull] string navigationName,
+            ConfigurationSource configurationSource)
+            => HasOwnership(
+                new TypeIdentity(targetEntityTypeName), Check.NotNull(clrType, nameof(clrType)),
+                MemberIdentity.Create(navigationName), inverse: null, configurationSource);
 
         /// <summary>
         ///     This is an internal API that supports the Entity Framework Core infrastructure and not subject to
@@ -2966,8 +2981,8 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
             [NotNull] string navigationName,
             ConfigurationSource configurationSource)
             => HasOwnership(
-                new TypeIdentity(targetEntityType, Metadata.Model), MemberIdentity.Create(navigationName),
-                inverse: null, configurationSource);
+                new TypeIdentity(targetEntityType, Metadata.Model), sharedTypeClrType: null,
+                MemberIdentity.Create(navigationName), inverse: null, configurationSource);
 
         /// <summary>
         ///     This is an internal API that supports the Entity Framework Core infrastructure and not subject to
@@ -2980,8 +2995,23 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
             [NotNull] MemberInfo navigationMember,
             ConfigurationSource configurationSource)
             => HasOwnership(
-                new TypeIdentity(targetEntityType, Metadata.Model), MemberIdentity.Create(navigationMember),
-                inverse: null, configurationSource);
+                new TypeIdentity(targetEntityType, Metadata.Model), sharedTypeClrType: null,
+                MemberIdentity.Create(navigationMember), inverse: null, configurationSource);
+
+        /// <summary>
+        ///     This is an internal API that supports the Entity Framework Core infrastructure and not subject to
+        ///     the same compatibility standards as public APIs. It may be changed or removed without notice in
+        ///     any release. You should only use it directly in your code with extreme caution and knowing that
+        ///     doing so can result in application failures when updating to a new Entity Framework Core release.
+        /// </summary>
+        public virtual InternalForeignKeyBuilder HasOwnership(
+            [NotNull] string targetEntityTypeName,
+            [NotNull] Type clrType,
+            [NotNull] MemberInfo navigationMember,
+            ConfigurationSource configurationSource)
+            => HasOwnership(
+                new TypeIdentity(targetEntityTypeName), Check.NotNull(clrType, nameof(clrType)),
+                MemberIdentity.Create(navigationMember), inverse: null, configurationSource);
 
         /// <summary>
         ///     This is an internal API that supports the Entity Framework Core infrastructure and not subject to
@@ -2996,6 +3026,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
             ConfigurationSource configurationSource)
             => HasOwnership(
                 new TypeIdentity(targetEntityType, Metadata.Model),
+                sharedTypeClrType: null,
                 MemberIdentity.Create(navigationPropertyName),
                 MemberIdentity.Create(inversePropertyName),
                 configurationSource);
@@ -3013,12 +3044,14 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
             ConfigurationSource configurationSource)
             => HasOwnership(
                 new TypeIdentity(targetEntityType, Metadata.Model),
+                sharedTypeClrType: null,
                 MemberIdentity.Create(navigationMember),
                 MemberIdentity.Create(inverseMember),
                 configurationSource);
 
         private InternalForeignKeyBuilder HasOwnership(
             in TypeIdentity targetEntityType,
+            Type sharedTypeClrType,
             MemberIdentity navigation,
             MemberIdentity? inverse,
             ConfigurationSource configurationSource)
@@ -3033,6 +3066,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
                     if (existingNavigation.TargetEntityType.Name == targetEntityType.Name)
                     {
                         var existingOwnedEntityType = existingNavigation.ForeignKey.DeclaringEntityType;
+                        // Upgrade counfigurationSouce for existing entity type
                         if (existingOwnedEntityType.HasDefiningNavigation())
                         {
                             if (targetEntityType.Type != null)
@@ -3060,7 +3094,14 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
                             }
                             else
                             {
-                                ModelBuilder.Entity(targetEntityType.Name, configurationSource, shouldBeOwned: true);
+                                if (sharedTypeClrType != null)
+                                {
+                                    ModelBuilder.Entity(targetEntityType.Name, sharedTypeClrType, configurationSource, shouldBeOwned: true);
+                                }
+                                else
+                                {
+                                    ModelBuilder.Entity(targetEntityType.Name, configurationSource, shouldBeOwned: true);
+                                }
                             }
                         }
 
@@ -3087,7 +3128,9 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
                 var principalBuilder = this;
                 var targetTypeName = targetEntityType.Name;
                 var targetType = targetEntityType.Type;
-                if (targetType == null)
+                if (targetType == null
+                    // Only find target type based on navigation if not pointing to shared type entity type.
+                    && sharedTypeClrType == null)
                 {
                     var memberType = existingNavigation?.GetIdentifyingMemberInfo()?.GetMemberType();
                     if (memberType != null)
@@ -3125,7 +3168,9 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
                         ModelBuilder.Metadata.RemoveIgnored(targetTypeName);
 
                         ownedEntityType = targetType == null
-                            ? ModelBuilder.Entity(targetTypeName, configurationSource, shouldBeOwned: true)
+                            ? sharedTypeClrType == null
+                                ? ModelBuilder.Entity(targetTypeName, configurationSource, shouldBeOwned: true)
+                                : ModelBuilder.Entity(targetTypeName, sharedTypeClrType, configurationSource, shouldBeOwned: true)
                             : ModelBuilder.Entity(targetType, configurationSource, shouldBeOwned: true);
                     }
 
@@ -4244,7 +4289,8 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
         /// </summary>
         IConventionEntityType IConventionEntityTypeBuilder.Metadata
         {
-            [DebuggerStepThrough] get => Metadata;
+            [DebuggerStepThrough]
+            get => Metadata;
         }
 
         /// <summary>
@@ -4730,6 +4776,32 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
             Type targetEntityType, MemberInfo navigationToTarget, MemberInfo inverseProperty, bool fromDataAnnotation)
             => HasOwnership(
                 targetEntityType, navigationToTarget, inverseProperty,
+                fromDataAnnotation ? ConfigurationSource.DataAnnotation : ConfigurationSource.Convention);
+
+        /// <summary>
+        ///     This is an internal API that supports the Entity Framework Core infrastructure and not subject to
+        ///     the same compatibility standards as public APIs. It may be changed or removed without notice in
+        ///     any release. You should only use it directly in your code with extreme caution and knowing that
+        ///     doing so can result in application failures when updating to a new Entity Framework Core release.
+        /// </summary>
+        [DebuggerStepThrough]
+        IConventionForeignKeyBuilder IConventionEntityTypeBuilder.HasOwnership(
+            string targetEntityTypeName, Type targetEntityClrType, string navigationToTargetName, bool fromDataAnnotation)
+            => HasOwnership(
+                targetEntityTypeName, targetEntityClrType, navigationToTargetName,
+                fromDataAnnotation ? ConfigurationSource.DataAnnotation : ConfigurationSource.Convention);
+
+        /// <summary>
+        ///     This is an internal API that supports the Entity Framework Core infrastructure and not subject to
+        ///     the same compatibility standards as public APIs. It may be changed or removed without notice in
+        ///     any release. You should only use it directly in your code with extreme caution and knowing that
+        ///     doing so can result in application failures when updating to a new Entity Framework Core release.
+        /// </summary>
+        [DebuggerStepThrough]
+        IConventionForeignKeyBuilder IConventionEntityTypeBuilder.HasOwnership(
+            string targetEntityTypeName, Type targetEntityClrType, MemberInfo navigationToTarget, bool fromDataAnnotation)
+            => HasOwnership(
+                targetEntityTypeName, targetEntityClrType, navigationToTarget,
                 fromDataAnnotation ? ConfigurationSource.DataAnnotation : ConfigurationSource.Convention);
 
         /// <summary>
