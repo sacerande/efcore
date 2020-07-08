@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -353,6 +354,46 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
 
                 Assert.Equal(PropertyAccessMode.Field, principal.FindSkipNavigation("Dependents").GetPropertyAccessMode());
                 Assert.Equal(PropertyAccessMode.Property, dependent.FindSkipNavigation("ManyToManyPrincipals").GetPropertyAccessMode());
+            }
+
+            [ConditionalFact]
+            public virtual void Can_use_shared_Type_as_join_entity()
+            {
+                var modelBuilder = CreateModelBuilder();
+                var model = modelBuilder.Model;
+
+                modelBuilder.Ignore<OneToManyNavPrincipal>();
+                modelBuilder.Ignore<OneToOneNavPrincipal>();
+
+                modelBuilder.Entity<ManyToManyNavPrincipal>()
+                    .HasMany(e => e.Dependents)
+                    .WithMany(e => e.ManyToManyPrincipals)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "Shared1",
+                        e => e.HasOne<NavDependent>().WithMany(),
+                        e => e.HasOne<ManyToManyNavPrincipal>().WithMany());
+
+                modelBuilder.Entity<ManyToManyPrincipalWithField>()
+                    .HasMany(e => e.Dependents)
+                    .WithMany(e => e.ManyToManyPrincipals)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "Shared2",
+                        e => e.HasOne<DependentWithField>().WithMany(),
+                        e => e.HasOne<ManyToManyPrincipalWithField>().WithMany(),
+                        e => e.IndexerProperty<int>("Payload"));
+
+                var shared1 = modelBuilder.Model.FindEntityType("Shared1");
+                Assert.NotNull(shared1);
+                Assert.Equal(2, shared1.GetForeignKeys().Count());
+                Assert.True(shared1.HasSharedClrType);
+                Assert.Equal(typeof(Dictionary<string, object>), shared1.ClrType);
+
+                var shared2 = modelBuilder.Model.FindEntityType("Shared2");
+                Assert.NotNull(shared2);
+                Assert.Equal(2, shared2.GetForeignKeys().Count());
+                Assert.True(shared2.HasSharedClrType);
+                Assert.Equal(typeof(Dictionary<string, object>), shared2.ClrType);
+                Assert.NotNull(shared2.FindProperty("Payload"));
             }
         }
     }

@@ -86,21 +86,25 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
         /// <summary>
         ///     Configures the relationships to the entity types participating in the many-to-many relationship.
         /// </summary>
-        /// <param name="joinEntity"> The type of the join entity. </param>
+        /// <param name="joinEntityType"> The CLR type of the join entity. </param>
         /// <param name="configureRight"> The configuration for the relationship to the right entity type. </param>
         /// <param name="configureLeft"> The configuration for the relationship to the left entity type. </param>
         /// <returns> The builder for the association type. </returns>
         public virtual EntityTypeBuilder UsingEntity(
-            [NotNull] Type joinEntity,
+            [NotNull] Type joinEntityType,
             [NotNull] Func<EntityTypeBuilder, ReferenceCollectionBuilder> configureRight,
             [NotNull] Func<EntityTypeBuilder, ReferenceCollectionBuilder> configureLeft)
         {
-            if (((Model)LeftEntityType.Model).IsShared(joinEntity))
+            Check.NotNull(joinEntityType, nameof(joinEntityType));
+            Check.NotNull(configureRight, nameof(configureRight));
+            Check.NotNull(configureLeft, nameof(configureLeft));
+
+            if (((Model)LeftEntityType.Model).IsShared(joinEntityType))
             {
                 //TODO #9914 - when the generic version of "please use the shared-type entity type version of this API"
                 // is available then update to use that.
                 throw new InvalidOperationException(
-                    CoreStrings.DoNotUseUsingEntityOnSharedClrType(joinEntity.GetType().Name));
+                    CoreStrings.DoNotUseUsingEntityOnSharedClrType(joinEntityType.GetType().Name));
             }
 
             var existingAssociationEntityType = (EntityType)
@@ -113,7 +117,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             }
 
             var entityTypeBuilder = new EntityTypeBuilder(
-                ModelBuilder.Entity(joinEntity, ConfigurationSource.Explicit).Metadata);
+                ModelBuilder.Entity(joinEntityType, ConfigurationSource.Explicit).Metadata);
 
             var leftForeignKey = configureLeft(entityTypeBuilder).Metadata;
             var rightForeignKey = configureRight(entityTypeBuilder).Metadata;
@@ -126,18 +130,90 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
         /// <summary>
         ///     Configures the relationships to the entity types participating in the many-to-many relationship.
         /// </summary>
-        /// <param name="joinEntity"> The type of the join entity. </param>
+        /// <param name="joinEntityTypeName"> The name of the join entity. </param>
+        /// <param name="joinEntityType"> The CLR type of the join entity. </param>
+        /// <param name="configureRight"> The configuration for the relationship to the right entity type. </param>
+        /// <param name="configureLeft"> The configuration for the relationship to the left entity type. </param>
+        /// <returns> The builder for the association type. </returns>
+        public virtual EntityTypeBuilder UsingEntity(
+            [NotNull] string joinEntityTypeName,
+            [NotNull] Type joinEntityType,
+            [NotNull] Func<EntityTypeBuilder, ReferenceCollectionBuilder> configureRight,
+            [NotNull] Func<EntityTypeBuilder, ReferenceCollectionBuilder> configureLeft)
+        {
+            Check.NotEmpty(joinEntityTypeName, nameof(joinEntityTypeName));
+            Check.NotNull(joinEntityType, nameof(joinEntityType));
+            Check.NotNull(configureRight, nameof(configureRight));
+            Check.NotNull(configureLeft, nameof(configureLeft));
+
+            var existingAssociationEntityType = (EntityType)
+                (LeftNavigation.ForeignKey?.DeclaringEntityType
+                    ?? RightNavigation.ForeignKey?.DeclaringEntityType);
+            if (existingAssociationEntityType != null)
+            {
+                ModelBuilder.RemoveAssociationEntityIfCreatedImplicitly(
+                    existingAssociationEntityType, removeSkipNavigations: false, ConfigurationSource.Explicit);
+            }
+
+            var entityTypeBuilder = new EntityTypeBuilder(
+                ModelBuilder.Entity(joinEntityTypeName, joinEntityType, ConfigurationSource.Explicit).Metadata);
+
+            var leftForeignKey = configureLeft(entityTypeBuilder).Metadata;
+            var rightForeignKey = configureRight(entityTypeBuilder).Metadata;
+
+            Using(rightForeignKey, leftForeignKey);
+
+            return entityTypeBuilder;
+        }
+
+        /// <summary>
+        ///     Configures the relationships to the entity types participating in the many-to-many relationship.
+        /// </summary>
+        /// <param name="joinEntityType"> The CLR type of the join entity. </param>
         /// <param name="configureRight"> The configuration for the relationship to the right entity type. </param>
         /// <param name="configureLeft"> The configuration for the relationship to the left entity type. </param>
         /// <param name="configureAssociation"> The configuration of the association type. </param>
         /// <returns> The builder for the originating entity type so that multiple configuration calls can be chained. </returns>
         public virtual EntityTypeBuilder UsingEntity(
-            [NotNull] Type joinEntity,
+            [NotNull] Type joinEntityType,
             [NotNull] Func<EntityTypeBuilder, ReferenceCollectionBuilder> configureRight,
             [NotNull] Func<EntityTypeBuilder, ReferenceCollectionBuilder> configureLeft,
             [NotNull] Action<EntityTypeBuilder> configureAssociation)
         {
-            var entityTypeBuilder = UsingEntity(joinEntity, configureRight, configureLeft);
+            Check.NotNull(joinEntityType, nameof(joinEntityType));
+            Check.NotNull(configureRight, nameof(configureRight));
+            Check.NotNull(configureLeft, nameof(configureLeft));
+            Check.NotNull(configureAssociation, nameof(configureAssociation));
+
+            var entityTypeBuilder = UsingEntity(joinEntityType, configureRight, configureLeft);
+            configureAssociation(entityTypeBuilder);
+
+            return new EntityTypeBuilder(LeftEntityType);
+        }
+
+        /// <summary>
+        ///     Configures the relationships to the entity types participating in the many-to-many relationship.
+        /// </summary>
+        /// <param name="joinEntityName"> The name of the join entity. </param>
+        /// <param name="joinEntityType"> The CLR type of the join entity. </param>
+        /// <param name="configureRight"> The configuration for the relationship to the right entity type. </param>
+        /// <param name="configureLeft"> The configuration for the relationship to the left entity type. </param>
+        /// <param name="configureAssociation"> The configuration of the association type. </param>
+        /// <returns> The builder for the originating entity type so that multiple configuration calls can be chained. </returns>
+        public virtual EntityTypeBuilder UsingEntity(
+            [NotNull] string joinEntityName,
+            [NotNull] Type joinEntityType,
+            [NotNull] Func<EntityTypeBuilder, ReferenceCollectionBuilder> configureRight,
+            [NotNull] Func<EntityTypeBuilder, ReferenceCollectionBuilder> configureLeft,
+            [NotNull] Action<EntityTypeBuilder> configureAssociation)
+        {
+            Check.NotEmpty(joinEntityName, nameof(joinEntityName));
+            Check.NotNull(joinEntityType, nameof(joinEntityType));
+            Check.NotNull(configureRight, nameof(configureRight));
+            Check.NotNull(configureLeft, nameof(configureLeft));
+            Check.NotNull(configureAssociation, nameof(configureAssociation));
+
+            var entityTypeBuilder = UsingEntity(joinEntityName, joinEntityType, configureRight, configureLeft);
             configureAssociation(entityTypeBuilder);
 
             return new EntityTypeBuilder(LeftEntityType);

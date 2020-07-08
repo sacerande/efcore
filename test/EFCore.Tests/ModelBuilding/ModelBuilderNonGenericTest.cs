@@ -746,6 +746,20 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                     r => ((NonGenericTestReferenceCollectionBuilder<TRightEntity, TAssociationEntity>)configureLeft(
                         new NonGenericTestEntityTypeBuilder<TAssociationEntity>(r))).ReferenceCollectionBuilder));
 
+            public override TestEntityTypeBuilder<TAssociationEntity> UsingEntity<TAssociationEntity>(
+                string joinEntityName,
+                Func<TestEntityTypeBuilder<TAssociationEntity>,
+                    TestReferenceCollectionBuilder<TLeftEntity, TAssociationEntity>> configureRight,
+                Func<TestEntityTypeBuilder<TAssociationEntity>,
+                    TestReferenceCollectionBuilder<TRightEntity, TAssociationEntity>> configureLeft)
+                => new NonGenericTestEntityTypeBuilder<TAssociationEntity>(CollectionCollectionBuilder.UsingEntity(
+                    joinEntityName,
+                    typeof(TAssociationEntity),
+                    l => ((NonGenericTestReferenceCollectionBuilder<TLeftEntity, TAssociationEntity>)configureRight(
+                        new NonGenericTestEntityTypeBuilder<TAssociationEntity>(l))).ReferenceCollectionBuilder,
+                    r => ((NonGenericTestReferenceCollectionBuilder<TRightEntity, TAssociationEntity>)configureLeft(
+                        new NonGenericTestEntityTypeBuilder<TAssociationEntity>(r))).ReferenceCollectionBuilder));
+
             public override TestEntityTypeBuilder<TLeftEntity> UsingEntity<TAssociationEntity>(
                 Func<TestEntityTypeBuilder<TAssociationEntity>,
                     TestReferenceCollectionBuilder<TLeftEntity, TAssociationEntity>> configureRight,
@@ -754,6 +768,23 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                 Action<TestEntityTypeBuilder<TAssociationEntity>> configureAssociation)
                 where TAssociationEntity : class
                 => new NonGenericTestEntityTypeBuilder<TLeftEntity>(CollectionCollectionBuilder.UsingEntity(
+                    typeof(TAssociationEntity),
+                    l => ((NonGenericTestReferenceCollectionBuilder<TLeftEntity, TAssociationEntity>)configureRight(
+                        new NonGenericTestEntityTypeBuilder<TAssociationEntity>(l))).ReferenceCollectionBuilder,
+                    r => ((NonGenericTestReferenceCollectionBuilder<TRightEntity, TAssociationEntity>)configureLeft(
+                        new NonGenericTestEntityTypeBuilder<TAssociationEntity>(r))).ReferenceCollectionBuilder,
+                    e => configureAssociation(new NonGenericTestEntityTypeBuilder<TAssociationEntity>(e))));
+
+            public override TestEntityTypeBuilder<TLeftEntity> UsingEntity<TAssociationEntity>(
+                string joinEntityName,
+                Func<TestEntityTypeBuilder<TAssociationEntity>,
+                    TestReferenceCollectionBuilder<TLeftEntity, TAssociationEntity>> configureRight,
+                Func<TestEntityTypeBuilder<TAssociationEntity>,
+                    TestReferenceCollectionBuilder<TRightEntity, TAssociationEntity>> configureLeft,
+                Action<TestEntityTypeBuilder<TAssociationEntity>> configureAssociation)
+                where TAssociationEntity : class
+                => new NonGenericTestEntityTypeBuilder<TLeftEntity>(CollectionCollectionBuilder.UsingEntity(
+                    joinEntityName,
                     typeof(TAssociationEntity),
                     l => ((NonGenericTestReferenceCollectionBuilder<TLeftEntity, TAssociationEntity>)configureRight(
                         new NonGenericTestEntityTypeBuilder<TAssociationEntity>(l))).ReferenceCollectionBuilder,
