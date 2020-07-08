@@ -172,7 +172,7 @@ namespace Microsoft.EntityFrameworkCore.Query.Internal
                         navigationExpansionExpression = CreateNavigationExpansionExpression(queryRootExpression, entityType);
                     }
 
-                    return ApplyQueryFilter(navigationExpansionExpression);
+                    return ApplyQueryFilter(navigationExpansionExpression, entityType);
 
                 case NavigationExpansionExpression _:
                 case OwnedNavigationReference _:
@@ -1353,12 +1353,11 @@ namespace Microsoft.EntityFrameworkCore.Query.Internal
             }
         }
 
-        private Expression ApplyQueryFilter(NavigationExpansionExpression navigationExpansionExpression)
+        private Expression ApplyQueryFilter(NavigationExpansionExpression navigationExpansionExpression, IEntityType entityType)
         {
             if (!_queryCompilationContext.IgnoreQueryFilters)
             {
                 var sequenceType = navigationExpansionExpression.Type.GetSequenceType();
-                var entityType = _queryCompilationContext.Model.FindEntityType(sequenceType);
                 var rootEntityType = entityType.GetRootType();
                 var queryFilter = rootEntityType.GetQueryFilter();
                 if (queryFilter != null)

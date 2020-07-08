@@ -2383,14 +2383,6 @@ namespace Microsoft.EntityFrameworkCore.Diagnostics
                 entityType);
 
         /// <summary>
-        ///     Cannot find entity type with type '{clrType}' since model contains shared entity type(s) with same type.
-        /// </summary>
-        public static string CannotFindEntityWithClrTypeWhenShared([CanBeNull] object clrType)
-            => string.Format(
-                GetString("CannotFindEntityWithClrTypeWhenShared", nameof(clrType)),
-                clrType);
-
-        /// <summary>
         ///     The skip navigation '{skipNavigation}' cannot be removed because it is set as the inverse of the skip navigation '{inverseSkipNavigation}' on '{referencingEntityType}'. All referencing skip navigations must be removed before this skip navigation can be removed.
         /// </summary>
         public static string SkipNavigationInUseBySkipNavigation([CanBeNull] object skipNavigation, [CanBeNull] object inverseSkipNavigation, [CanBeNull] object referencingEntityType)
