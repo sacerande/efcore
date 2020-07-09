@@ -122,11 +122,11 @@ namespace Microsoft.EntityFrameworkCore
                 .HasEntityTypeWithDefiningNavigation(Check.NotNull(name, nameof(name)));
 
         /// <summary>
-        ///     Gets whether the CLR type is used by shared entities in the model.
+        ///     Gets whether the CLR type is used by shared type entities in the model.
         /// </summary>
         /// <param name="model"> The model to find the entity type in. </param>
         /// <param name="clrType"> The CLR type. </param>
-        /// <returns> Whether the CLR type is used by shared entities in the model. </returns>
+        /// <returns> Whether the CLR type is used by shared type entities in the model. </returns>
         [DebuggerStepThrough]
         public static bool IsShared([NotNull] this IModel model, [NotNull] Type clrType)
             => Check.NotNull(model, nameof(model)).AsModel().IsShared(Check.NotNull(clrType, nameof(clrType)));

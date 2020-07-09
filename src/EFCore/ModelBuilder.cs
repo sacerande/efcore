@@ -116,8 +116,17 @@ namespace Microsoft.EntityFrameworkCore
             => new EntityTypeBuilder<TEntity>(Builder.Entity(typeof(TEntity), ConfigurationSource.Explicit).Metadata);
 
         /// <summary>
-        ///     Returns an object that can be used to configure a given entity type in the model.
-        ///     If the entity type is not already part of the model, it will be added to the model.
+        ///     <para>
+        ///         Returns an object that can be used to configure a given shared type entity type in the model.
+        ///     </para>
+        ///     <para>
+        ///         If an entity type with the provided name is not already part of the model, a new entity type with provided CLR
+        ///         type will be added to the model as shared type entity type.
+        ///     </para>
+        ///     <para>
+        ///         Shared type entity type is an entity type which can share CLR type with other types in the model but has
+        ///         a unique name and always identified by the name.
+        ///     </para>
         /// </summary>
         /// <typeparam name="TEntity"> The CLR type of the entity type to be configured. </typeparam>
         /// <param name="name"> The name of the entity type to be configured. </param>
@@ -209,8 +218,15 @@ namespace Microsoft.EntityFrameworkCore
 
         /// <summary>
         ///     <para>
-        ///         Performs configuration of a given entity type in the model. If the entity type is not already part
-        ///         of the model, it will be added to the model.
+        ///         Returns an object that can be used to configure a given shared type entity type in the model.
+        ///     </para>
+        ///     <para>
+        ///         If an entity type with the provided name is not already part of the model, a new entity type with provided CLR
+        ///         type will be added to the model as shared type entity type.
+        ///     </para>
+        ///     <para>
+        ///         Shared type entity type is an entity type which can share CLR type with other types in the model but has
+        ///         a unique name and always identified by the name.
         ///     </para>
         ///     <para>
         ///         This overload allows configuration of the entity type to be done inline in the method call rather
@@ -290,9 +306,15 @@ namespace Microsoft.EntityFrameworkCore
 
         /// <summary>
         ///     <para>
-        ///         Performs configuration of a given entity type in the model.
-        ///         If an entity type with the provided name is not already part of the model,
-        ///         a new entity type that does not have a corresponding CLR type will be added to the model.
+        ///         Returns an object that can be used to configure a given shared type entity type in the model.
+        ///     </para>
+        ///     <para>
+        ///         If an entity type with the provided name is not already part of the model, a new entity type with provided CLR
+        ///         type will be added to the model as shared type entity type.
+        ///     </para>
+        ///     <para>
+        ///         Shared type entity type is an entity type which can share CLR type with other types in the model but has
+        ///         a unique name and always identified by the name.
         ///     </para>
         ///     <para>
         ///         This overload allows configuration of the entity type to be done in line in the method call rather

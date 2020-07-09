@@ -2592,6 +2592,10 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                     .WithMany();
 
                 Assert.Equal(2, modelBuilder.Model.GetEntityTypes().Where(e => e.HasSharedClrType).Count());
+
+                Assert.Equal(
+                    CoreStrings.ClashingSharedType(typeof(SharedTypeEntityType).DisplayName()),
+                    Assert.Throws<InvalidOperationException>(() => modelBuilder.Entity<SharedTypeEntityType>()).Message);
             }
         }
     }

@@ -2017,6 +2017,10 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                     .WithOne();
 
                 Assert.Equal(2, modelBuilder.Model.GetEntityTypes().Where(e => e.HasSharedClrType).Count());
+
+                Assert.Equal(
+                    CoreStrings.ClashingSharedType(typeof(SharedTypeEntityType).DisplayName()),
+                    Assert.Throws<InvalidOperationException>(() => modelBuilder.Entity<SharedTypeEntityType>()).Message);
             }
 
             [ConditionalFact]
@@ -2027,7 +2031,7 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                 modelBuilder.Entity<SharedTypeEntityType>();
 
                 Assert.Equal(
-                    "Existing nonshared type",
+                    CoreStrings.ClashingNonSharedType("Shared1"),
                     Assert.Throws<InvalidOperationException>(
                         () => modelBuilder.Entity<SharedHolderAlpha>()
                             .HasMany("Shared1", e => e.SharedCollection)).Message);

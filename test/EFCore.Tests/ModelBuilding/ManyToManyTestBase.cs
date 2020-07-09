@@ -394,7 +394,32 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                 Assert.True(shared2.HasSharedClrType);
                 Assert.Equal(typeof(Dictionary<string, object>), shared2.ClrType);
                 Assert.NotNull(shared2.FindProperty("Payload"));
+
+                Assert.Equal(
+                    CoreStrings.ClashingSharedType(typeof(Dictionary<string, object>).DisplayName()),
+                    Assert.Throws<InvalidOperationException>(() => modelBuilder.Entity<Dictionary<string, object>>()).Message);
             }
+
+            [ConditionalFact]
+            public virtual void Cannot_add_shared_type_when_non_shared_exists()
+            {
+                var modelBuilder = CreateModelBuilder();
+
+                modelBuilder.Entity<ManyToManyJoinWithFields>();
+
+                Assert.Equal(
+                    CoreStrings.ClashingNonSharedType("Shared"),
+                    Assert.Throws<InvalidOperationException>(
+                        () => modelBuilder.Entity<ManyToManyPrincipalWithField>()
+                            .HasMany(e => e.Dependents)
+                            .WithMany(e => e.ManyToManyPrincipals)
+                            .UsingEntity<ManyToManyJoinWithFields>(
+                                "Shared",
+                                r => r.HasOne<DependentWithField>().WithMany(),
+                                l => l.HasOne<ManyToManyPrincipalWithField>().WithMany())).Message);
+            }
+
+
         }
     }
 }

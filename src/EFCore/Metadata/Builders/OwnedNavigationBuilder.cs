@@ -475,7 +475,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
 
             using (DependentEntityType.Model.ConventionDispatcher.DelayConventions())
             {
-                buildAction.Invoke(OwnsOneBuilder(new TypeIdentity(ownedTypeName), clrType, navigationName));
+                buildAction(OwnsOneBuilder(new TypeIdentity(ownedTypeName), clrType, navigationName));
                 return this;
             }
         }

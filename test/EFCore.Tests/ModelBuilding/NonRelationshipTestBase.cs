@@ -1563,7 +1563,7 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                 Assert.NotNull(shared2.FindProperty("Id"));
 
                 Assert.Equal(
-                    "CannotCreateEntityType",
+                    CoreStrings.ClashingSharedType(typeof(Dictionary<string, object>).DisplayName()),
                     Assert.Throws<InvalidOperationException>(() => modelBuilder.Entity<Dictionary<string, object>>()).Message);
             }
 
@@ -1575,7 +1575,7 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                 modelBuilder.Entity<SharedTypeEntityType>();
 
                 Assert.Equal(
-                    "Existing nonshared type",
+                    CoreStrings.ClashingNonSharedType("Shared1"),
                     Assert.Throws<InvalidOperationException>(() => modelBuilder.Entity<SharedTypeEntityType>("Shared1")).Message);
             }
         }

@@ -306,7 +306,7 @@ namespace Microsoft.EntityFrameworkCore
 
                 if (Model.IsShared(type))
                 {
-                    throw new InvalidOperationException("Invalid");
+                    throw new InvalidOperationException(CoreStrings.InvalidSetSharedType(type.ShortDisplayName()));
                 }
 
                 throw new InvalidOperationException(CoreStrings.InvalidSetType(type.ShortDisplayName()));

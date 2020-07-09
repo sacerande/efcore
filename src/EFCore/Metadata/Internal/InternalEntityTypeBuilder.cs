@@ -2962,12 +2962,12 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
         ///     doing so can result in application failures when updating to a new Entity Framework Core release.
         /// </summary>
         public virtual InternalForeignKeyBuilder HasOwnership(
-            [NotNull] string targetEntityTypeName,
+            [NotNull] string targetEntityName,
             [NotNull] Type clrType,
             [NotNull] string navigationName,
             ConfigurationSource configurationSource)
             => HasOwnership(
-                new TypeIdentity(targetEntityTypeName), Check.NotNull(clrType, nameof(clrType)),
+                new TypeIdentity(targetEntityName), Check.NotNull(clrType, nameof(clrType)),
                 MemberIdentity.Create(navigationName), inverse: null, configurationSource);
 
         /// <summary>
@@ -3006,7 +3006,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
         /// </summary>
         public virtual InternalForeignKeyBuilder HasOwnership(
             [NotNull] Type targetEntityType,
-            [NotNull] MemberIdentity navigation,
+            MemberIdentity navigation,
             ConfigurationSource configurationSource)
             => HasOwnership(
                 new TypeIdentity(targetEntityType, Metadata.Model), targetClrType: null,
@@ -3019,12 +3019,12 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
         ///     doing so can result in application failures when updating to a new Entity Framework Core release.
         /// </summary>
         public virtual InternalForeignKeyBuilder HasOwnership(
-            [NotNull] string targetEntityTypeName,
+            [NotNull] string targetEntityName,
             [NotNull] Type clrType,
             [NotNull] MemberInfo navigationMember,
             ConfigurationSource configurationSource)
             => HasOwnership(
-                new TypeIdentity(targetEntityTypeName), Check.NotNull(clrType, nameof(clrType)),
+                new TypeIdentity(targetEntityName), Check.NotNull(clrType, nameof(clrType)),
                 MemberIdentity.Create(navigationMember), inverse: null, configurationSource);
 
         /// <summary>
@@ -3036,7 +3036,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
         public virtual InternalForeignKeyBuilder HasOwnership(
             [NotNull] string targetEntityTypeName,
             [NotNull] Type clrType,
-            [NotNull] MemberIdentity navigation,
+            MemberIdentity navigation,
             ConfigurationSource configurationSource)
             => HasOwnership(
                 new TypeIdentity(targetEntityTypeName), Check.NotNull(clrType, nameof(clrType)),
@@ -4815,9 +4815,9 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
         /// </summary>
         [DebuggerStepThrough]
         IConventionForeignKeyBuilder IConventionEntityTypeBuilder.HasOwnership(
-            string targetEntityTypeName, Type targetEntityClrType, string navigationToTargetName, bool fromDataAnnotation)
+            string targetEntityName, Type targetEntityClrType, string navigationToTargetName, bool fromDataAnnotation)
             => HasOwnership(
-                targetEntityTypeName, targetEntityClrType, navigationToTargetName,
+                targetEntityName, targetEntityClrType, navigationToTargetName,
                 fromDataAnnotation ? ConfigurationSource.DataAnnotation : ConfigurationSource.Convention);
 
         /// <summary>
@@ -4828,9 +4828,9 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
         /// </summary>
         [DebuggerStepThrough]
         IConventionForeignKeyBuilder IConventionEntityTypeBuilder.HasOwnership(
-            string targetEntityTypeName, Type targetEntityClrType, MemberInfo navigationToTarget, bool fromDataAnnotation)
+            string targetEntityName, Type targetEntityClrType, MemberInfo navigationToTarget, bool fromDataAnnotation)
             => HasOwnership(
-                targetEntityTypeName, targetEntityClrType, navigationToTarget,
+                targetEntityName, targetEntityClrType, navigationToTarget,
                 fromDataAnnotation ? ConfigurationSource.DataAnnotation : ConfigurationSource.Convention);
 
         /// <summary>

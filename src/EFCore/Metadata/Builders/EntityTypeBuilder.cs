@@ -707,7 +707,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             Check.NotEmpty(navigationName, nameof(navigationName));
             Check.NotNull(buildAction, nameof(buildAction));
 
-            buildAction.Invoke(OwnsManyBuilder(new TypeIdentity(ownedType, (Model)Metadata.Model), targetClrType: null, navigationName));
+            buildAction(OwnsManyBuilder(new TypeIdentity(ownedType, (Model)Metadata.Model), targetClrType: null, navigationName));
             return this;
         }
 

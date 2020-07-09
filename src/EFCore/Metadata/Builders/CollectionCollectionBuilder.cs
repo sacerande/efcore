@@ -130,18 +130,18 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
         /// <summary>
         ///     Configures the relationships to the entity types participating in the many-to-many relationship.
         /// </summary>
-        /// <param name="joinEntityTypeName"> The name of the join entity. </param>
+        /// <param name="joinEntityName"> The name of the join entity. </param>
         /// <param name="joinEntityType"> The CLR type of the join entity. </param>
         /// <param name="configureRight"> The configuration for the relationship to the right entity type. </param>
         /// <param name="configureLeft"> The configuration for the relationship to the left entity type. </param>
         /// <returns> The builder for the association type. </returns>
         public virtual EntityTypeBuilder UsingEntity(
-            [NotNull] string joinEntityTypeName,
+            [NotNull] string joinEntityName,
             [NotNull] Type joinEntityType,
             [NotNull] Func<EntityTypeBuilder, ReferenceCollectionBuilder> configureRight,
             [NotNull] Func<EntityTypeBuilder, ReferenceCollectionBuilder> configureLeft)
         {
-            Check.NotEmpty(joinEntityTypeName, nameof(joinEntityTypeName));
+            Check.NotEmpty(joinEntityName, nameof(joinEntityName));
             Check.NotNull(joinEntityType, nameof(joinEntityType));
             Check.NotNull(configureRight, nameof(configureRight));
             Check.NotNull(configureLeft, nameof(configureLeft));
@@ -156,7 +156,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             }
 
             var entityTypeBuilder = new EntityTypeBuilder(
-                ModelBuilder.Entity(joinEntityTypeName, joinEntityType, ConfigurationSource.Explicit).Metadata);
+                ModelBuilder.Entity(joinEntityName, joinEntityType, ConfigurationSource.Explicit).Metadata);
 
             var leftForeignKey = configureLeft(entityTypeBuilder).Metadata;
             var rightForeignKey = configureRight(entityTypeBuilder).Metadata;

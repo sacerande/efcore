@@ -491,7 +491,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
             Assert.True(model.FindEntityType(sharedTypeName).HasSharedClrType);
 
             Assert.Equal(
-                "Same name used for different shared type entity type.",
+                CoreStrings.ClashingMismatchedSharedType("SpecialDetails"),
                 Assert.Throws<InvalidOperationException>(() => modelBuilder.Entity(sharedTypeName, typeof(Product), ConfigurationSource.DataAnnotation)).Message);
 
             Assert.NotNull(modelBuilder.Entity(typeof(Product), ConfigurationSource.DataAnnotation));
@@ -501,7 +501,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
             Assert.NotNull(modelBuilder.Entity(typeof(Product), ConfigurationSource.Explicit));
 
             Assert.Equal(
-                "Existing nonshared type",
+                CoreStrings.ClashingNonSharedType(typeof(Product).DisplayName()),
                 Assert.Throws<InvalidOperationException>(() => modelBuilder.Entity(typeof(Product).DisplayName(), typeof(Product), ConfigurationSource.Explicit)).Message);
         }
 

@@ -87,18 +87,18 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
         /// <summary>
         ///     Configures the relationships to the entity types participating in the many-to-many relationship.
         /// </summary>
-        /// <param name="entityTypeName"> The name of the association entity. </param>
+        /// <param name="joinEntityName"> The name of the association entity. </param>
         /// <param name="configureRight"> The configuration for the relationship to the right entity type. </param>
         /// <param name="configureLeft"> The configuration for the relationship to the left entity type. </param>
         /// <typeparam name="TAssociationEntity"> The type of the association entity. </typeparam>
         /// <returns> The builder for the association type. </returns>
         public virtual EntityTypeBuilder<TAssociationEntity> UsingEntity<TAssociationEntity>(
-            [NotNull] string entityTypeName,
+            [NotNull] string joinEntityName,
             [NotNull] Func<EntityTypeBuilder<TAssociationEntity>, ReferenceCollectionBuilder<TLeftEntity, TAssociationEntity>> configureRight,
             [NotNull] Func<EntityTypeBuilder<TAssociationEntity>, ReferenceCollectionBuilder<TRightEntity, TAssociationEntity>> configureLeft)
             where TAssociationEntity : class
         {
-            Check.NotEmpty(entityTypeName, nameof(entityTypeName));
+            Check.NotEmpty(joinEntityName, nameof(joinEntityName));
             Check.NotNull(configureRight, nameof(configureRight));
             Check.NotNull(configureLeft, nameof(configureLeft));
 
@@ -112,7 +112,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             }
 
             var entityTypeBuilder = new EntityTypeBuilder<TAssociationEntity>(
-                ModelBuilder.Entity(entityTypeName, typeof(TAssociationEntity), ConfigurationSource.Explicit).Metadata);
+                ModelBuilder.Entity(joinEntityName, typeof(TAssociationEntity), ConfigurationSource.Explicit).Metadata);
 
             var leftForeignKey = configureLeft(entityTypeBuilder).Metadata;
             var rightForeignKey = configureRight(entityTypeBuilder).Metadata;

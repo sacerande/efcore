@@ -232,7 +232,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
                 {
                     if (_entityTypes.Any(et => !et.Value.HasSharedClrType && et.Value.ClrType == entityType.ClrType))
                     {
-                        throw new InvalidOperationException("CannotAddSharedTypeMatchingTypeOfNonShared");
+                        throw new InvalidOperationException(CoreStrings.ClashingNonSharedType(entityType.DisplayName()));
                     }
 
                     _sharedEntityClrTypes.Add(entityType.ClrType);

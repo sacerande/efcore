@@ -1885,7 +1885,7 @@ namespace Microsoft.EntityFrameworkCore.Diagnostics
                 entityType);
 
         /// <summary>
-        ///     Cannot create a DbSet for '{typeName}' because it is mapped to multiple entity types and should they should be accessed through the defining entities.
+        ///     Cannot create a DbSet for '{typeName}' because it is mapped to multiple entity types and should be accessed through the defining entities.
         /// </summary>
         public static string InvalidSetTypeWeak([CanBeNull] object typeName)
             => string.Format(
@@ -2715,6 +2715,30 @@ namespace Microsoft.EntityFrameworkCore.Diagnostics
             => string.Format(
                 GetString("DoNotUseUsingEntityOnSharedClrType", nameof(clrType)),
                 clrType);
+
+        /// <summary>
+        ///     The shared type entity type '{entityType}' cannot be added to the model because a shared entity type with the same name but different clr type already exists.
+        /// </summary>
+        public static string ClashingMismatchedSharedType([CanBeNull] object entityType)
+            => string.Format(
+                GetString("ClashingMismatchedSharedType", nameof(entityType)),
+                entityType);
+
+        /// <summary>
+        ///     The shared type entity type '{entityType}' cannot be added to the model because a non shared entity type with the same clr type already exists.
+        /// </summary>
+        public static string ClashingNonSharedType([CanBeNull] object entityType)
+            => string.Format(
+                GetString("ClashingNonSharedType", nameof(entityType)),
+                entityType);
+
+        /// <summary>
+        ///     Cannot create a DbSet for '{typeName}' because it is configured as an shared type entity type and should be accessed through entity type name based Set method.
+        /// </summary>
+        public static string InvalidSetSharedType([CanBeNull] object typeName)
+            => string.Format(
+                GetString("InvalidSetSharedType", nameof(typeName)),
+                typeName);
 
         private static string GetString(string name, params string[] formatterNames)
         {

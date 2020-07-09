@@ -1590,6 +1590,10 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                         Assert.True(t.HasSharedClrType);
                         Assert.NotNull(t.FindProperty("Random"));
                     });
+
+                Assert.Equal(
+                    CoreStrings.ClashingSharedType(typeof(SharedTypeEntityType).DisplayName()),
+                    Assert.Throws<InvalidOperationException>(() => modelBuilder.Entity<SharedTypeEntityType>()).Message);
             }
 
             [ConditionalFact]
@@ -1615,6 +1619,10 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                         Assert.True(t.HasSharedClrType);
                         Assert.NotNull(t.FindProperty("Random"));
                     });
+
+                Assert.Equal(
+                    CoreStrings.ClashingSharedType(typeof(SharedTypeEntityType).DisplayName()),
+                    Assert.Throws<InvalidOperationException>(() => modelBuilder.Entity<SharedTypeEntityType>()).Message);
             }
 
             [ConditionalFact]
@@ -1645,6 +1653,10 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                         Assert.True(t.HasSharedClrType);
                         Assert.NotNull(t.FindProperty("NestedRandom"));
                     });
+
+                Assert.Equal(
+                    CoreStrings.ClashingSharedType(typeof(SharedNestedOwnedEntityType).DisplayName()),
+                    Assert.Throws<InvalidOperationException>(() => modelBuilder.Entity<SharedNestedOwnedEntityType>()).Message);
             }
 
             [ConditionalFact]
@@ -1675,6 +1687,10 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                         Assert.True(t.HasSharedClrType);
                         Assert.NotNull(t.FindProperty("NestedRandom"));
                     });
+
+                Assert.Equal(
+                    CoreStrings.ClashingSharedType(typeof(SharedNestedOwnedEntityType).DisplayName()),
+                    Assert.Throws<InvalidOperationException>(() => modelBuilder.Entity<SharedNestedOwnedEntityType>()).Message);
             }
 
             [ConditionalFact]
@@ -1707,6 +1723,10 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                         Assert.True(t.HasSharedClrType);
                         Assert.NotNull(t.FindProperty("Value"));
                     });
+
+                Assert.Equal(
+                    CoreStrings.ClashingSharedType(typeof(NestedReference).DisplayName()),
+                    Assert.Throws<InvalidOperationException>(() => modelBuilder.Entity<NestedReference>()).Message);
             }
 
             [ConditionalFact]
@@ -1717,12 +1737,12 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                 modelBuilder.Entity<SharedTypeEntityType>();
 
                 Assert.Equal(
-                    "Existing nonshared type",
+                    CoreStrings.ClashingNonSharedType("Shared1"),
                     Assert.Throws<InvalidOperationException>(
                         () => modelBuilder.Entity<SharedHolderAlpha>().OwnsOne<SharedTypeEntityType>("Shared1", e => e.SharedReference)).Message);
 
                 Assert.Equal(
-                    "Existing nonshared type",
+                    CoreStrings.ClashingNonSharedType("Shared1"),
                     Assert.Throws<InvalidOperationException>(
                         () => modelBuilder.Entity<SharedHolderAlpha>().OwnsMany("Shared1", e => e.SharedCollection)).Message);
             }
@@ -1737,17 +1757,17 @@ namespace Microsoft.EntityFrameworkCore.ModelBuilding
                 modelBuilder.Entity<NestedReference>();
 
                 Assert.Equal(
-                    "Existing nonshared type",
+                    CoreStrings.ClashingNonSharedType("Shared1"),
                     Assert.Throws<InvalidOperationException>(
                         () => ownedBuilder.OwnsOne<SharedNestedOwnedEntityType>("Shared1", e => e.NestedReference)).Message);
 
                 Assert.Equal(
-                    "Existing nonshared type",
+                    CoreStrings.ClashingNonSharedType("Shared1"),
                     Assert.Throws<InvalidOperationException>(
                         () => ownedBuilder.OwnsMany("Shared1", e => e.NestedCollection)).Message);
 
                 Assert.Equal(
-                    "Existing nonshared type",
+                    CoreStrings.ClashingNonSharedType("Shared1"),
                     Assert.Throws<InvalidOperationException>(
                         () => ownedBuilder.HasOne("Shared1", e => e.ReferenceNavigation).WithOne()).Message);
             }

@@ -76,7 +76,7 @@ namespace Microsoft.EntityFrameworkCore.Internal
 
                     if (_context.Model.IsShared(typeof(TEntity)))
                     {
-                        throw new InvalidOperationException("Invalid entity");
+                        throw new InvalidOperationException(CoreStrings.InvalidSetSharedType(typeof(TEntity).ShortDisplayName()));
                     }
 
                     throw new InvalidOperationException(CoreStrings.InvalidSetType(typeof(TEntity).ShortDisplayName()));

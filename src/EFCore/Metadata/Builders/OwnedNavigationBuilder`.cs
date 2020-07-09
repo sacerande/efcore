@@ -384,7 +384,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             Check.NotNull(navigationName, nameof(navigationName));
             Check.NotNull(buildAction, nameof(buildAction));
 
-            buildAction.Invoke(OwnsOneBuilder<TNewDependentEntity>(targetTypeName: null, new MemberIdentity(navigationName)));
+            buildAction(OwnsOneBuilder<TNewDependentEntity>(targetTypeName: null, new MemberIdentity(navigationName)));
             return this;
         }
 
@@ -676,7 +676,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
 
             using (DependentEntityType.Model.ConventionDispatcher.DelayConventions())
             {
-                buildAction.Invoke(OwnsManyBuilder<TNewDependentEntity>(targetTypeName: null, new MemberIdentity(navigationName)));
+                buildAction(OwnsManyBuilder<TNewDependentEntity>(targetTypeName: null, new MemberIdentity(navigationName)));
                 return this;
             }
         }
@@ -717,7 +717,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
 
             using (DependentEntityType.Model.ConventionDispatcher.DelayConventions())
             {
-                buildAction.Invoke(OwnsManyBuilder<TNewDependentEntity>(targetTypeName, new MemberIdentity(navigationName)));
+                buildAction(OwnsManyBuilder<TNewDependentEntity>(targetTypeName, new MemberIdentity(navigationName)));
                 return this;
             }
         }
@@ -756,7 +756,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
 
             using (DependentEntityType.Model.ConventionDispatcher.DelayConventions())
             {
-                buildAction.Invoke(OwnsManyBuilder<TNewDependentEntity>(targetTypeName: null, new MemberIdentity(navigationExpression.GetMemberAccess())));
+                buildAction(OwnsManyBuilder<TNewDependentEntity>(targetTypeName: null, new MemberIdentity(navigationExpression.GetMemberAccess())));
                 return this;
             }
         }
@@ -798,7 +798,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
 
             using (DependentEntityType.Model.ConventionDispatcher.DelayConventions())
             {
-                buildAction.Invoke(OwnsManyBuilder<TNewDependentEntity>(targetTypeName, new MemberIdentity(navigationExpression.GetMemberAccess())));
+                buildAction(OwnsManyBuilder<TNewDependentEntity>(targetTypeName, new MemberIdentity(navigationExpression.GetMemberAccess())));
                 return this;
             }
         }
