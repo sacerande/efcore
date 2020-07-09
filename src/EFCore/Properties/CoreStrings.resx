@@ -1421,9 +1421,6 @@
   <data name="PrincipalKeylessType" xml:space="preserve">
     <value>The entity type '{entityType}' cannot be on the principal end of the relationship between '{firstNavigationSpecification}' and '{secondNavigationSpecification}'. The principal entity type must have a key.</value>
   </data>
-  <data name="DoNotUseUsingEntityOnSharedClrType" xml:space="preserve">
-    <value>Cannot use UsingEntity() passing type '{clrType}' because the model contains shared entity type(s) with same type. Use a type which uniquely defines an entity type.</value>
-  </data>
   <data name="ClashingMismatchedSharedType" xml:space="preserve">
     <value>The shared type entity type '{entityType}' cannot be added to the model because a shared entity type with the same name but different clr type already exists.</value>
   </data>

@@ -99,14 +99,6 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Builders
             Check.NotNull(configureRight, nameof(configureRight));
             Check.NotNull(configureLeft, nameof(configureLeft));
 
-            if (((Model)LeftEntityType.Model).IsShared(joinEntityType))
-            {
-                //TODO #9914 - when the generic version of "please use the shared-type entity type version of this API"
-                // is available then update to use that.
-                throw new InvalidOperationException(
-                    CoreStrings.DoNotUseUsingEntityOnSharedClrType(joinEntityType.GetType().Name));
-            }
-
             var existingAssociationEntityType = (EntityType)
                 (LeftNavigation.ForeignKey?.DeclaringEntityType
                     ?? RightNavigation.ForeignKey?.DeclaringEntityType);

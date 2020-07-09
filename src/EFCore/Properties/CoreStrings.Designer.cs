@@ -2709,14 +2709,6 @@ namespace Microsoft.EntityFrameworkCore.Diagnostics
                 entityType, firstNavigationSpecification, secondNavigationSpecification);
 
         /// <summary>
-        ///     Cannot use UsingEntity() passing type '{clrType}' because the model contains shared entity type(s) with same type. Use a type which uniquely defines an entity type.
-        /// </summary>
-        public static string DoNotUseUsingEntityOnSharedClrType([CanBeNull] object clrType)
-            => string.Format(
-                GetString("DoNotUseUsingEntityOnSharedClrType", nameof(clrType)),
-                clrType);
-
-        /// <summary>
         ///     The shared type entity type '{entityType}' cannot be added to the model because a shared entity type with the same name but different clr type already exists.
         /// </summary>
         public static string ClashingMismatchedSharedType([CanBeNull] object entityType)
